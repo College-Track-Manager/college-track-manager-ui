@@ -2,7 +2,7 @@
 
 ## Project info
 
-**URL**: https://github.com/CollegeTrackManager/college-track-manager-ui.git
+**URL**: https://github.com/CollegeTrackManager/college-track-manager-ui
 
 ## First Time Setup
 
@@ -14,7 +14,7 @@
 
 1. **Clone the repository**
 ```sh
-git clone https://github.com/HagarElmasry/college-track-manager.git
+git clone https://github.com/CollegeTrackManager/college-track-manager-ui.git
 cd college-track-manager
 ```
 
