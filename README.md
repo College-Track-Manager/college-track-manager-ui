@@ -2,7 +2,7 @@
 
 ## Project info
 
-**URL**: https://github.com/HagarElmasry/college-track-manager
+**URL**: https://github.com/CollegeTrackManager/college-track-manager-ui.git
 
 ## First Time Setup
 
