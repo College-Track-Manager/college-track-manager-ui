@@ -39,6 +39,8 @@ const fetchTrackById = async (id: number): Promise<Track> => {
   return response.data;
 };
 
+export { fetchTrackById };
+
 export const useTracksByType = (type: TrackType) => {
   return useQuery({
     queryKey: ['tracks', type],

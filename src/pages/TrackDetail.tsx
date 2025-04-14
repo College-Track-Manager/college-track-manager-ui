@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
@@ -7,7 +6,7 @@ import PageTransition from '@/components/ui/PageTransition';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { tracks } from '@/data/tracks';
+import { fetchTrackById } from '@/services/tracks';
 
 const TrackDetail = () => {
   const { trackId } = useParams();
@@ -16,17 +15,20 @@ const TrackDetail = () => {
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    // Simulate loading data
-    const timer = setTimeout(() => {
-      const foundTrack = tracks.find(t => t.id === trackId);
-      if (foundTrack) {
-        setTrack(foundTrack);
+    const loadTrack = async () => {
+      try {
+        const trackData = await fetchTrackById(Number(trackId));
+        setTrack(trackData);
+      } catch (error) {
+        console.error('Error fetching track details:', error);
+        navigate('/tracks', { replace: true });
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    }, 400);
-    
-    return () => clearTimeout(timer);
-  }, [trackId]);
+    };
+
+    loadTrack();
+  }, [trackId, navigate]);
   
   // Handle track not found
   useEffect(() => {
