@@ -5,33 +5,38 @@ const Header = () => {
   const location = useLocation();
   
   return (
-    <header className="bg-white shadow-sm">
+    <header className="bg-white border-b sticky top-0 z-50">
       <div className="container-content">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-24">
           {/* Logo and College Name */}
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-4">
             <img 
               src="/images/4c8c79f0-18df-43cd-ae29-1ac5134baf4c.png" 
               alt="شعار جامعة القاهرة" 
-              className="h-14 w-14"
+              className="h-16 w-16"
             />
-            <div className="flex flex-col">
-              <span className="font-semibold text-base text-[#002b4e]">جامعة القاهرة</span>
-              <span className="text-sm text-muted-foreground">كلية الدراسات العليا للبحوث الإحصائية</span>
+            <div className="flex flex-col gap-0.5">
+              <span className="font-semibold text-xl text-[#002b4e]">جامعة القاهرة</span>
+              <span className="text-[15px] text-gray-600">كلية الدراسات العليا للبحوث الإحصائية</span>
             </div>
           </Link>
 
           {/* Navigation */}
-          <nav className="flex items-center gap-8">
+          <nav className="flex items-center gap-10">
             <NavLink to="/" isActive={location.pathname === '/'}>
               الرئيسية
             </NavLink>
             <NavLink to="/tracks" isActive={location.pathname.startsWith('/tracks')}>
               البرامج الدراسية
             </NavLink>
-            <NavLink to="/registration" isActive={location.pathname === '/registration'}>
-              التسجيل
-            </NavLink>
+            <div className="flex items-center gap-8">
+              <NavLink to="/login" isActive={location.pathname === '/login'}>
+                تسجيل الدخول
+              </NavLink>
+              <NavLink to="/registration" isActive={location.pathname === '/registration'}>
+                إنشاء حساب
+              </NavLink>
+            </div>
           </nav>
         </div>
       </div>
@@ -44,8 +49,8 @@ const NavLink = ({ children, to, isActive }: { children: React.ReactNode; to: st
     <Link
       to={to}
       className={cn(
-        "text-base transition-colors relative py-1",
-        isActive ? "text-primary font-medium" : "text-foreground/80 hover:text-foreground"
+        "text-base transition-colors relative py-2",
+        isActive ? "text-primary font-medium" : "text-gray-600 hover:text-gray-900"
       )}
     >
       {children}
