@@ -11,7 +11,8 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import Index from "./pages/Index";
 import Tracks from "./pages/Tracks";
 import TrackDetail from "./pages/TrackDetail";
-import Registration from "./pages/Registration";
+import Login from "./pages/Login";
+import StudentRegistration from "./pages/StudentRegistration";
 import AdminDashboard from "./pages/AdminDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
 import NotFound from "./pages/NotFound";
@@ -32,21 +33,24 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Header />
-        <main className="min-h-screen pt-20">
-          <AnimatePresence mode="wait">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/tracks" element={<Tracks />} />
-              <Route path="/tracks/:trackId" element={<TrackDetail />} />
-              <Route path="/registration" element={<Registration />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/dashboard" element={<StudentDashboard />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AnimatePresence>
-        </main>
-        <Footer />
+        <div className="min-h-screen flex flex-col bg-gray-50">
+          <Header />
+          <main className="flex-1 flex flex-col">
+            <AnimatePresence mode="wait">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/tracks" element={<Tracks />} />
+                <Route path="/tracks/:trackId" element={<TrackDetail />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/registration" element={<StudentRegistration />} />
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/student/dashboard" element={<StudentDashboard />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AnimatePresence>
+          </main>
+          <Footer />
+        </div>
       </BrowserRouter>
       <ReactQueryDevtools initialIsOpen={false} />
     </TooltipProvider>
