@@ -34,7 +34,9 @@ const Header = () => {
             <div className="flex items-center gap-8">
               {isAuthenticated ? (
                 <>
-                  <span className="text-sm font-medium text-gray-700">{user?.email}</span>
+                  <NavLink to="/student/dashboard" isActive={location.pathname.startsWith('/student/dashboard')}>
+                    لوحة التحكم
+                  </NavLink>
                   <button
                     onClick={logout}
                     className="text-red-600 hover:text-red-800 border border-red-200 rounded px-3 py-1 ml-2"

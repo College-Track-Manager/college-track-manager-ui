@@ -20,19 +20,18 @@ export interface StudentRegistration {
 }
 
 export const registrationsApi = {
-  submit: async (data: FormData): Promise<any> => {
+  submit: async (data: any): Promise<any> => {
     const url = `${API_BASE_URL}/api/userregistration/register`;
-    console.log('[registrationsApi.submit] POST', url, 'FormData:', Array.from(data.entries()));
+    console.log('[registrationsApi.submit] POST', url, 'Payload:', data);
     try {
       const response = await axios.post(url, data, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
         },
       });
       console.log('[registrationsApi.submit] Response:', response);
       console.log('[registrationsApi.submit] Returned Data:', response.data);
       return response.data;
-    
     } catch (error) {
       console.error('[registrationsApi.submit] Error:', error);
       throw error;

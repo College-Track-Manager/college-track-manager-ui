@@ -1,22 +1,15 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { motion, useInView } from 'framer-motion';
-import { ChevronLeft, Upload, CheckCircle } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import PageTransition from '@/components/ui/PageTransition';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useToast } from '@/hooks/use-toast';
-import { tracks } from '@/data/tracks';
 import { useNavigate } from 'react-router-dom';
 import { registrationsApi } from '@/services/registrations';
-import { registerUser } from '@/services/auth';
-import { toast } from 'sonner';
 
 const registrationSchema = z.object({
   firstName: z.string()
@@ -25,43 +18,21 @@ const registrationSchema = z.object({
   lastName: z.string().min(2, { message: 'الاسم الأخير مطلوب' }),
   email: z.string().email({ message: 'عنوان البريد الإلكتروني غير صالح' }),
   phone: z.string().min(10, { message: 'رقم هاتف صالح مطلوب' }),
-  nationalId: z.string().length(14, { message: 'الرقم القومي يجب أن يتكون من ١٤ رقم' }).regex(/^\d+$/, { message: 'الرقم القومي يجب أن يحتوي على أرقام فقط' }),
+  nationalId: z.string().length(14, { message: 'الرقم القومي يجب أن يتكون من ١٤ رقم' }).regex(/^[0-9]+$/, { message: 'الرقم القومي يجب أن يحتوي على أرقام فقط' }),
   address: z.string().min(5, { message: 'العنوان مطلوب' }),
-  track: z.string().min(1, { message: 'الرجاء اختيار مسار' }),
-  educationLevel: z.string().min(1, { message: 'الرجاء اختيار المرحلة الدراسية' }),
-  education: z.string().min(5, { message: 'الخلفية التعليمية مطلوبة' }),
-  statement: z.string().min(50, { message: 'يجب أن تكون الرسالة الشخصية ٥٠ حرفًا على الأقل' }),
+  password: z.string().min(6, { message: 'كلمة المرور مطلوبة ويجب أن تكون 6 أحرف على الأقل' }),
+  confirmPassword: z.string().min(6, { message: 'تأكيد كلمة المرور مطلوب' }),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'كلمتا المرور غير متطابقتين',
+  path: ['confirmPassword'],
 });
 
 type RegistrationFormValues = z.infer<typeof registrationSchema>;
 
 const Registration = () => {
-  const [step, setStep] = useState(1);
-  const [documents, setDocuments] = useState({
-    resume: null,
-    transcript: null,
-    idCard: null,
-  });
-  const [formSubmitted, setFormSubmitted] = useState(false);
-  const { toast } = useToast();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
-    FirstName: '',
-    LastName: '',
-    Email: '',
-    Phone: '',
-    Address: '',
-    Track: '',
-    Education: '',
-    Statement: '',
-  });
-  const [files, setFiles] = useState({
-    resume: null as File | null,
-    transcript: null as File | null,
-    idCard: null as File | null,
-  });
-  
+  const [formSubmitted, setFormSubmitted] = useState(false);
   const form = useForm<RegistrationFormValues>({
     resolver: zodResolver(registrationSchema),
     defaultValues: {
@@ -71,547 +42,183 @@ const Registration = () => {
       phone: '',
       nationalId: '',
       address: '',
-      track: '',
-      educationLevel: '',
-      education: '',
-      statement: '',
+      password: '',
+      confirmPassword: '',
     },
   });
-  
-  const handleDocumentUpload = (type, e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setDocuments({
-        ...documents,
-        [type]: file,
-      });
-      
-      toast({
-        title: "تم رفع المستند",
-        description: `تم رفع ${file.name} بنجاح.`,
-      });
-    }
-  };
-  
-  const nextStep = () => {
-    if (step === 1) {
-      form.trigger(['firstName', 'lastName', 'email', 'phone', 'nationalId', 'address']);
-      const hasErrors = !!form.formState.errors.firstName || 
-                        !!form.formState.errors.lastName || 
-                        !!form.formState.errors.email || 
-                        !!form.formState.errors.phone ||
-                        !!form.formState.errors.nationalId ||
-                        !!form.formState.errors.address;
-                        
-      if (!hasErrors) {
-        setStep(2);
-        window.scrollTo(0, 0);
-      }
-    } else if (step === 2) {
-      form.trigger(['track', 'educationLevel', 'education', 'statement']);
-      const hasErrors = !!form.formState.errors.track || 
-                        !!form.formState.errors.educationLevel || 
-                        !!form.formState.errors.education || 
-                        !!form.formState.errors.statement;
-                        
-      if (!hasErrors) {
-        setStep(3);
-        window.scrollTo(0, 0);
-      }
-    }
-  };
-  
-  const prevStep = () => {
-    if (step > 1) {
-      setStep(step - 1);
-      window.scrollTo(0, 0);
-    }
-  };
-  
+
+
+
   const onSubmit = async (data: RegistrationFormValues) => {
-  console.log('[Registration] onSubmit called with data:', data);
-
-    if (!documents.resume || !documents.transcript || !documents.idCard) {
-      toast({
-        title: "خطأ",
-        description: "يرجى رفع جميع المستندات المطلوبة",
-        variant: "destructive",
-      });
-      return;
-    }
-
+    console.log("onSubmit called!", data); // Debug log
     setIsSubmitting(true);
     setFormSubmitted(false);
-    window.scrollTo(0, 0);
     try {
-      // First, register the user
-      const userRegistrationPayload = {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        phone: data.phone,
-        nationalId: data.nationalId,
-        address: data.address,
-        password: data.nationalId, // or prompt for password if needed
-        confirmPassword: data.nationalId, // or prompt for password if needed
+      // Prepare JSON payload
+      const payload = {
+        FirstName: data.firstName,
+        LastName: data.lastName,
+        Email: data.email,
+        Phone: data.phone,
+        NationalId: data.nationalId,
+        Address: data.address,
+        Password: data.password,
+        ConfirmPassword: data.confirmPassword,
       };
-      console.log('[Registration] Calling registerUser with:', userRegistrationPayload);
-      const response = await registerUser(userRegistrationPayload);
-      console.log('[Registration] registerUser response:', response);
-      if (response.message !== "Registration successful") {
-        toast({
-          title: "خطأ في إنشاء الحساب",
-          description: response.errors?.[0]?.description || response.message,
-          variant: "destructive",
-        });
+      console.log("Calling registrationsApi.submit", payload); // Debug log
+      const response = await registrationsApi.submit(payload);
+      if (!response || response.error) {
+        alert(response?.error || "فشل في إرسال البيانات");
         setIsSubmitting(false);
         return;
       }
-      // Now submit the application form
-      const formDataToSubmit = new FormData();
-      formDataToSubmit.append('FirstName', data.firstName);
-      formDataToSubmit.append('LastName', data.lastName);
-      formDataToSubmit.append('Email', data.email);
-      formDataToSubmit.append('Phone', data.phone);
-      formDataToSubmit.append('Address', data.address);
-      formDataToSubmit.append('Track', data.track);
-      formDataToSubmit.append('Education', data.education);
-      formDataToSubmit.append('Statement', data.statement);
-      // Add files
-      if (documents.resume) formDataToSubmit.append('resume', documents.resume);
-      if (documents.transcript) formDataToSubmit.append('transcript', documents.transcript);
-      if (documents.idCard) formDataToSubmit.append('idCard', documents.idCard);
-      console.log('[Registration] Calling registrationsApi.submit with FormData:', Array.from(formDataToSubmit.entries()));
-      await registrationsApi.submit(formDataToSubmit);
-      console.log('[Registration] registrationsApi.submit completed successfully');
-      toast({
-        title: "تم تقديم الطلب",
-        description: "تم إنشاء الحساب وتقديم طلبك بنجاح وهو قيد المراجعة.",
-      });
+      alert("تم إنشاء الحساب بنجاح. يمكنك الآن تسجيل الدخول.");
       setFormSubmitted(true);
       navigate('/login');
     } catch (error) {
-      console.error('[Registration] Failed to register or submit application:', error);
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء إنشاء الحساب أو تقديم طلب التسجيل",
-        variant: "destructive",
-      });
+      alert("حدث خطأ أثناء إنشاء الحساب");
     } finally {
       setIsSubmitting(false);
     }
   };
-  
+
   if (formSubmitted) {
     return (
-      <PageTransition>
-        <div className="py-16 md:py-24">
-          <div className="container-content max-w-2xl mx-auto text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-              <CheckCircle size={40} className="text-green-600" />
-            </div>
-            <h1 className="mt-6 text-3xl font-bold">تم تقديم الطلب!</h1>
-            <p className="mt-4 text-muted-foreground">
-              شكرًا لتقديم طلبك إلى برنامج كوليدج تراك. تم استلام طلبك وهو الآن قيد المراجعة من قبل فريق القبول لدينا.
-            </p>
-            <div className="mt-8 p-6 bg-secondary/50 rounded-lg text-right">
-              <h3 className="font-semibold">ماذا يحدث بعد ذلك؟</h3>
-              <ol className="mt-4 space-y-4">
-                <li className="flex">
-                  <span className="bg-primary/10 text-primary font-medium h-6 w-6 rounded-full flex items-center justify-center ml-3 flex-shrink-0">١</span>
-                  <span>سيقوم فريق القبول لدينا بمراجعة طلبك والمستندات.</span>
-                </li>
-                <li className="flex">
-                  <span className="bg-primary/10 text-primary font-medium h-6 w-6 rounded-full flex items-center justify-center ml-3 flex-shrink-0">٢</span>
-                  <span>ستتلقى إشعارًا عبر البريد الإلكتروني حول حالة طلبك في غضون ٥-٧ أيام عمل.</span>
-                </li>
-                <li className="flex">
-                  <span className="bg-primary/10 text-primary font-medium h-6 w-6 rounded-full flex items-center justify-center ml-3 flex-shrink-0">٣</span>
-                  <span>إذا تمت الموافقة، ستتلقى تعليمات للدفع والخطوات التالية.</span>
-                </li>
-              </ol>
-            </div>
-            <div className="mt-8">
-              <Button onClick={() => window.location.href = '/'}>
-                العودة إلى الصفحة الرئيسية
-              </Button>
-            </div>
-          </div>
-        </div>
-      </PageTransition>
+      <div className="flex flex-col items-center justify-center min-h-[400px]">
+        <CheckCircle size={64} className="text-green-500 mb-4" />
+        <h2 className="text-2xl font-bold mb-2">تم إنشاء الحساب بنجاح</h2>
+        <Button onClick={() => navigate('/login')}>تسجيل الدخول</Button>
+      </div>
     );
   }
-  
+
   return (
     <PageTransition>
-      <div className="py-12">
-        <div className="container-content max-w-3xl mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold">التسجيل في البرنامج</h1>
-            <p className="mt-2 text-muted-foreground">
-              أكمل نموذج الطلب للتسجيل في المسار الذي اخترته
-            </p>
-          </div>
-          
-          <div className="mb-12">
-            <div className="flex items-center justify-between">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex flex-col items-center">
-                  <div 
-                    className={`h-10 w-10 rounded-full flex items-center justify-center ${
-                      step >= i ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground'
-                    }`}
-                  >
-                    {step > i ? <CheckCircle size={16} /> : i}
-                  </div>
-                  <span className={`mt-2 text-xs ${step >= i ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
-                    {i === 1 ? 'البيانات الشخصية' : i === 2 ? 'اختيار البرنامج' : 'رفع المستندات'}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-2 relative">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-secondary"></div>
-              <div 
-                className="absolute top-0 right-0 h-1 bg-primary transition-all duration-500"
-                style={{ width: `${((step - 1) / 2) * 100}%` }}
-              ></div>
-            </div>
-          </div>
-          
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <div style={{ display: step === 1 ? 'block' : 'none' }}>
-  <StepOne form={form} />
-</div>
-<div style={{ display: step === 2 ? 'block' : 'none' }}>
-  <StepTwo form={form} />
-</div>
-<div style={{ display: step === 3 ? 'block' : 'none' }}>
-  <StepThree handleDocumentUpload={handleDocumentUpload} documents={documents} />
-</div>
-              
-              <div className="flex justify-between mt-12">
-                {step > 1 && (
-                  <Button type="button" variant="outline" onClick={prevStep}>
-                    السابق
-                  </Button>
-                )}
-                
-                {step < 3 ? (
-                  <Button type="button" onClick={nextStep} className="mr-auto">
-                    متابعة <ChevronLeft size={16} className="mr-1" />
-                  </Button>
-                ) : (
-                  <Button type="submit" className="mr-auto" disabled={isSubmitting}>
-                    {isSubmitting ? 'جاري التقديم...' : 'تقديم الطلب'}
-                  </Button>
-                )}
+      <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
+        <h1 className="text-2xl font-bold mb-6 text-center">تسجيل حساب جديد</h1>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="firstName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>الاسم الأول</FormLabel>
+                  <FormControl>
+                    <Input placeholder="الاسم الأول" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="lastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>الاسم الأخير</FormLabel>
+                  <FormControl>
+                    <Input placeholder="الاسم الأخير" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>البريد الإلكتروني</FormLabel>
+                  <FormControl>
+                    <Input type="email" placeholder="your@email.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>رقم الهاتف</FormLabel>
+                  <FormControl>
+                    <Input placeholder="رقم الهاتف" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="nationalId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>الرقم القومي</FormLabel>
+                  <FormControl>
+                    <Input placeholder="الرقم القومي" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>العنوان</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="عنوانك" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>كلمة المرور</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="كلمة المرور" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>تأكيد كلمة المرور</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="تأكيد كلمة المرور" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* Debug: Show validation errors */}
+            {Object.values(form.formState.errors).length > 0 && (
+              <div style={{ color: 'red', marginBottom: 16 }}>
+                {Object.entries(form.formState.errors).map(([field, error]) => (
+                  <div key={field}>{field}: {(error as any)?.message}</div>
+                ))}
               </div>
-            </form>
-          </Form>
-        </div>
+            )}
+            {/* Debug: Show when submitting */}
+            {isSubmitting && <div style={{ color: 'blue', marginBottom: 8 }}>Submitting...</div>}
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? 'جاري إنشاء الحساب...' : 'إنشاء الحساب'}
+            </Button>
+          </form>
+        </Form>
       </div>
     </PageTransition>
-  );
-};
-
-const StepOne = ({ form }) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
-  
-  return (
-    <motion.div 
-      ref={ref}
-      initial={{ opacity: 0 }}
-      animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <h2 className="text-xl font-semibold mb-6">المعلومات الشخصية</h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <FormField
-          control={form.control}
-          name="firstName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>الاسم الأول</FormLabel>
-              <FormControl>
-                <Input placeholder="الاسم الأول" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="lastName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>الاسم الأخير</FormLabel>
-              <FormControl>
-                <Input placeholder="الاسم الأخير" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-      
-      <div className="mt-6">
-        <FormField
-          control={form.control}
-          name="nationalId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>الرقم القومي <span className="text-destructive">*</span></FormLabel>
-              <FormControl>
-                <Input type="text" placeholder="أدخل الرقم القومي المكون من ١٤ رقم" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-      
-      <div className="mt-6">
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>البريد الإلكتروني</FormLabel>
-              <FormControl>
-                <Input type="email" placeholder="your@email.com" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-      
-      <div className="mt-6">
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>رقم الهاتف</FormLabel>
-              <FormControl>
-                <Input placeholder="(123) 456-7890" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-      
-      <div className="mt-6">
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>العنوان</FormLabel>
-              <FormControl>
-                <Textarea placeholder="عنوانك" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-    </motion.div>
-  );
-};
-
-const StepTwo = ({ form }) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
-  
-  return (
-    <motion.div 
-      ref={ref}
-      initial={{ opacity: 0 }}
-      animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <h2 className="text-xl font-semibold mb-6">اختيار البرنامج</h2>
-      
-      <div className="space-y-6">
-        <FormField
-          control={form.control}
-          name="track"
-          render={({ field }) => (
-            <FormItem className="text-right">
-              <FormLabel>اختر المسار</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger className="text-right">
-                    <SelectValue placeholder="اختر مسارًا" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent align="end" className="text-right">
-                  {tracks.map((track) => (
-                    <SelectItem key={track.id} value={track.id}>
-                      {track.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="educationLevel"
-          render={({ field }) => (
-            <FormItem className="text-right">
-              <FormLabel>المرحلة الدراسية <span className="text-destructive">*</span></FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger className="text-right">
-                    <SelectValue placeholder="اختر المرحلة الدراسية" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent align="end" className="text-right">
-                  <SelectItem value="diploma">دبلوم</SelectItem>
-                  <SelectItem value="masters">ماجستير</SelectItem>
-                  <SelectItem value="phd">دكتوراه</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="education"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>الخلفية التعليمية</FormLabel>
-              <FormControl>
-                <Textarea 
-                  placeholder="صف خلفيتك التعليمية، بما في ذلك الشهادات التي حصلت عليها والمؤسسات التي درست فيها"
-                  {...field}
-                  className="min-h-[100px]"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="statement"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>الرسالة الشخصية</FormLabel>
-              <FormControl>
-                <Textarea 
-                  placeholder="أخبرنا لماذا أنت مهتم بهذا البرنامج وما الذي تأمل في تحقيقه"
-                  {...field}
-                  className="min-h-[150px]"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-    </motion.div>
-  );
-};
-
-const StepThree = ({ handleDocumentUpload, documents }) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
-  
-  const documentTypes = [
-    { 
-      id: 'resume', 
-      label: 'السيرة الذاتية', 
-      description: 'قم برفع سيرتك الذاتية الحالية (بتنسيق PDF)',
-      file: documents.resume
-    },
-    { 
-      id: 'transcript', 
-      label: 'السجل الأكاديمي', 
-      description: 'قم برفع سجلك الأكاديمي الرسمي أو غير الرسمي (بتنسيق PDF)',
-      file: documents.transcript
-    },
-    { 
-      id: 'idCard', 
-      label: 'بطاقة الهوية/جواز السفر', 
-      description: 'قم برفع نسخة من بطاقة هويتك الحكومية أو جواز سفرك (بتنسيق PDF أو صورة)',
-      file: documents.idCard
-    }
-  ];
-  
-  return (
-    <motion.div 
-      ref={ref}
-      initial={{ opacity: 0 }}
-      animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <h2 className="text-xl font-semibold mb-6">رفع المستندات</h2>
-      <p className="text-muted-foreground mb-6">
-        يرجى رفع المستندات المطلوبة التالية لإكمال طلبك
-      </p>
-      
-      <div className="space-y-6">
-        {documentTypes.map((doc) => (
-          <div key={doc.id} className="border border-border rounded-lg overflow-hidden">
-            <div className="p-4 bg-secondary/30">
-              <h3 className="font-medium">{doc.label} <span className="text-destructive">*</span></h3>
-              <p className="text-sm text-muted-foreground mt-1">{doc.description}</p>
-            </div>
-            
-            <div className="p-4">
-              {doc.file ? (
-                <div className="flex items-center">
-                  <CheckCircle size={18} className="text-green-600 ml-2" />
-                  <span className="text-sm">{doc.file.name}</span>
-                  <Button 
-                    type="button" 
-                    variant="ghost" 
-                    size="sm" 
-                    className="mr-auto text-muted-foreground hover:text-destructive"
-                    onClick={() => handleDocumentUpload(doc.id, { target: { files: [] } })}
-                  >
-                    استبدال
-                  </Button>
-                </div>
-              ) : (
-                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center relative">
-                  <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
-                  <p className="mt-2 text-sm font-medium">انقر للرفع أو اسحب وأفلت</p>
-                  <p className="mt-1 text-xs text-muted-foreground">PDF, JPG, أو PNG (الحد الأقصى ٥ ميجابايت)</p>
-                  <input
-                    type="file"
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    onChange={(e) => handleDocumentUpload(doc.id, e)}
-                    accept=".pdf,.jpg,.jpeg,.png"
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-      
-      <div className="mt-8 p-4 bg-secondary/30 rounded-lg">
-        <p className="text-sm text-muted-foreground">
-          بتقديم هذا الطلب، فإنك تؤكد أن جميع المعلومات المقدمة دقيقة وكاملة. قد تؤدي المعلومات الخاطئة إلى رفض طلبك أو إنهاء التسجيل.
-        </p>
-      </div>
-    </motion.div>
   );
 };
 

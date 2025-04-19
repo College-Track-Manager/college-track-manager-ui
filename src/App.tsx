@@ -15,6 +15,7 @@ import Tracks from "./pages/Tracks";
 import TrackDetail from "./pages/TrackDetail";
 import Login from "./pages/Login";
 import StudentRegistration from "./pages/StudentRegistration";
+import Registration from "./pages/Registration";
 import AdminDashboard from "./pages/AdminDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
 import NotFound from "./pages/NotFound";
@@ -45,7 +46,7 @@ const App = () => (
                   <Route path="/tracks" element={<Tracks />} />
                   <Route path="/tracks/:trackId" element={<TrackDetail />} />
                   <Route path="/login" element={<Login />} />
-                  <Route path="/registration" element={<StudentRegistration />} />
+                  <Route path="/registration" element={<Registration />} />
                   <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
                   <Route path="/student/dashboard" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
                   <Route path="*" element={<NotFound />} />

@@ -12,12 +12,14 @@ interface AuthContextProps {
   isAuthenticated: boolean;
   user: User | null;
   logout: () => void;
+  login: (token: string) => void;
 }
 
 const AuthContext = createContext<AuthContextProps>({
   isAuthenticated: false,
   user: null,
   logout: () => {},
+  login: () => {},
 });
 
 function parseJwt(token: string): any {
@@ -71,6 +73,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => window.removeEventListener('storage', checkAuth);
   }, []);
 
+  const login = (token: string) => {
+    localStorage.setItem('token', token);
+    const payload = parseJwt(token);
+    setUser({
+      email: payload?.email || payload?.sub,
+      name: payload?.name || payload?.sub,
+      ...payload
+    });
+    setIsAuthenticated(true);
+  };
+
   const logout = () => {
     removeToken();
     setUser(null);
@@ -79,7 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, logout, login }}>
       {children}
     </AuthContext.Provider>
   );

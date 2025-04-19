@@ -27,8 +27,14 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
+import { useLocation } from 'react-router-dom';
+
+import { useAuth } from '@/context/AuthContext';
+
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<LoginFormValues>({
@@ -43,10 +49,13 @@ const Login = () => {
     setIsSubmitting(true);
     try {
       // Use backend API for login
-      const { loginUser, setToken } = await import("@/services/auth");
+      const { loginUser } = await import("@/services/auth");
       const response = await loginUser({ Username: data.email, Password: data.password });
+      console.log('Login response:', response);
       if (response.token) {
-        setToken(response.token);
+        login(response.token); // Immediate auth context update
+        console.log('Token after login():', localStorage.getItem('token'));
+
         toast.success('تم تسجيل الدخول بنجاح', {
           description: 'مرحباً بك في لوحة التحكم',
           duration: 5000,
@@ -57,7 +66,20 @@ const Login = () => {
             color: '#166534',
           },
         });
-        navigate('/student/dashboard', { replace: true });
+        // Robust redirection: avoid redirecting back to /login or undefined
+        const from = (location.state as any)?.from?.pathname;
+        console.log('Navigating to:', from);
+        if (from && from !== '/login') {
+          navigate(from, { replace: true });
+        } else {
+          navigate('/student/dashboard', { replace: true });
+        }
+        // Fallback: if navigation fails, force reload
+        setTimeout(() => {
+          if (window.location.pathname === '/login') {
+            window.location.replace('/student/dashboard');
+          }
+        }, 500);
       } else {
         toast.error('فشل تسجيل الدخول', {
           description: response.message || 'يرجى التحقق من البريد الإلكتروني وكلمة المرور والمحاولة مرة أخرى',
@@ -92,7 +114,7 @@ const Login = () => {
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">تسجيل الدخول</CardTitle>
           <CardDescription className="text-center">
-            قم بتسجيل الدخول للوصول إلى البرامج الدراسية
+            قم بتسجيل الدخول للوصول إلى البرامج 
           </CardDescription>
         </CardHeader>
         <CardContent>
