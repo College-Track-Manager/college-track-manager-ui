@@ -84,18 +84,18 @@ const ProgramsTabsSection = () => {
       <div className="container-content">
         <h2 className="text-3xl font-bold text-[#002b4e] text-center mb-8">البرامج</h2>
         
-        <Tabs defaultValue="professional" className="w-full" onValueChange={handleTabChange}>
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
+        <Tabs defaultValue="academic" className="w-full" onValueChange={handleTabChange}>
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8 justify-end" dir="rtl">
             <TabsTrigger value="academic">البرامج الأكاديمية</TabsTrigger>
             <TabsTrigger value="professional">البرامج المهنية</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="professional">
-            <ProgramsContent tracks={tracks} isLoading={isLoading} isInView={isInView} />
-          </TabsContent>
-          
           <TabsContent value="academic">
-            <ProgramsContent tracks={tracks} isLoading={isLoading} isInView={isInView} />
+            <ProgramsContent tracks={tracks.slice(0, 3)} isLoading={isLoading} isInView={isInView} />
+          </TabsContent>
+
+          <TabsContent value="professional">
+            <ProgramsContent tracks={tracks.slice(0, 3)} isLoading={isLoading} isInView={isInView} />
           </TabsContent>
         </Tabs>
       </div>

@@ -42,41 +42,39 @@ const Login = () => {
   const onSubmit = async (data: LoginFormValues) => {
     setIsSubmitting(true);
     try {
-      // Simulate API call with credentials check
-      await new Promise((resolve, reject) => {
-        setTimeout(() => {
-          // Simple validation - in real app this would be an API call
-          if (data.email && data.password) {
-            resolve(true);
-          } else {
-            reject(new Error('Invalid credentials'));
-          }
-        }, 1000);
-      });
-      
-      // Store login state (in real app, you'd store a token)
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userEmail', data.email);
-      
-      toast.success('تم تسجيل الدخول بنجاح', {
-        description: 'مرحباً بك في لوحة التحكم',
-        duration: 5000,
-        icon: <CheckCircle className="h-5 w-5 text-green-500" />,
-        style: {
-          background: '#f0fdf4',
-          border: '1px solid #86efac',
-          color: '#166534',
-        },
-      });
-
-      // Redirect to student dashboard
-      navigate('/student/dashboard', { replace: true });
+      // Use backend API for login
+      const { loginUser, setToken } = await import("@/services/auth");
+      const response = await loginUser({ Username: data.email, Password: data.password });
+      if (response.token) {
+        setToken(response.token);
+        toast.success('تم تسجيل الدخول بنجاح', {
+          description: 'مرحباً بك في لوحة التحكم',
+          duration: 5000,
+          icon: <CheckCircle className="h-5 w-5 text-green-500" />, 
+          style: {
+            background: '#f0fdf4',
+            border: '1px solid #86efac',
+            color: '#166534',
+          },
+        });
+        navigate('/student/dashboard', { replace: true });
+      } else {
+        toast.error('فشل تسجيل الدخول', {
+          description: response.message || 'يرجى التحقق من البريد الإلكتروني وكلمة المرور والمحاولة مرة أخرى',
+          duration: 5000,
+          icon: <XCircle className="h-5 w-5 text-red-500" />, 
+          style: {
+            background: '#fef2f2',
+            border: '1px solid #fca5a5',
+            color: '#991b1b',
+          },
+        });
+      }
     } catch (error) {
-      console.error('Login failed:', error);
       toast.error('فشل تسجيل الدخول', {
-        description: 'يرجى التحقق من البريد الإلكتروني وكلمة المرور والمحاولة مرة أخرى',
+        description: 'حدث خطأ في الاتصال بالخادم',
         duration: 5000,
-        icon: <XCircle className="h-5 w-5 text-red-500" />,
+        icon: <XCircle className="h-5 w-5 text-red-500" />, 
         style: {
           background: '#fef2f2',
           border: '1px solid #fca5a5',

@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { tracks } from '@/data/tracks';
 import { useNavigate } from 'react-router-dom';
 import { registrationsApi } from '@/services/registrations';
+import { registerUser } from '@/services/auth';
 import { toast } from 'sonner';
 
 const registrationSchema = z.object({
@@ -128,6 +129,8 @@ const Registration = () => {
   };
   
   const onSubmit = async (data: RegistrationFormValues) => {
+  console.log('[Registration] onSubmit called with data:', data);
+
     if (!documents.resume || !documents.transcript || !documents.idCard) {
       toast({
         title: "خطأ",
@@ -136,38 +139,62 @@ const Registration = () => {
       });
       return;
     }
-    
-    console.log('Form submitted:', { ...data, documents });
-    
-    setFormSubmitted(true);
-    window.scrollTo(0, 0);
-    
-    setIsSubmitting(true);
-    
-    try {
-      const formDataToSubmit = new FormData();
-      
-      // Add form fields
-      Object.entries(data).forEach(([key, value]) => {
-        formDataToSubmit.append(key, value);
-      });
 
-      // Add files if they exist
+    setIsSubmitting(true);
+    setFormSubmitted(false);
+    window.scrollTo(0, 0);
+    try {
+      // First, register the user
+      const userRegistrationPayload = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        nationalId: data.nationalId,
+        address: data.address,
+        password: data.nationalId, // or prompt for password if needed
+        confirmPassword: data.nationalId, // or prompt for password if needed
+      };
+      console.log('[Registration] Calling registerUser with:', userRegistrationPayload);
+      const response = await registerUser(userRegistrationPayload);
+      console.log('[Registration] registerUser response:', response);
+      if (response.message !== "Registration successful") {
+        toast({
+          title: "خطأ في إنشاء الحساب",
+          description: response.errors?.[0]?.description || response.message,
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+      // Now submit the application form
+      const formDataToSubmit = new FormData();
+      formDataToSubmit.append('FirstName', data.firstName);
+      formDataToSubmit.append('LastName', data.lastName);
+      formDataToSubmit.append('Email', data.email);
+      formDataToSubmit.append('Phone', data.phone);
+      formDataToSubmit.append('Address', data.address);
+      formDataToSubmit.append('Track', data.track);
+      formDataToSubmit.append('Education', data.education);
+      formDataToSubmit.append('Statement', data.statement);
+      // Add files
       if (documents.resume) formDataToSubmit.append('resume', documents.resume);
       if (documents.transcript) formDataToSubmit.append('transcript', documents.transcript);
       if (documents.idCard) formDataToSubmit.append('idCard', documents.idCard);
-
+      console.log('[Registration] Calling registrationsApi.submit with FormData:', Array.from(formDataToSubmit.entries()));
       await registrationsApi.submit(formDataToSubmit);
+      console.log('[Registration] registrationsApi.submit completed successfully');
       toast({
         title: "تم تقديم الطلب",
-        description: "تم تقديم طلبك بنجاح وهو قيد المراجعة.",
+        description: "تم إنشاء الحساب وتقديم طلبك بنجاح وهو قيد المراجعة.",
       });
-      navigate('/tracks');
+      setFormSubmitted(true);
+      navigate('/login');
     } catch (error) {
-      console.error('Failed to submit registration:', error);
+      console.error('[Registration] Failed to register or submit application:', error);
       toast({
         title: "خطأ",
-        description: "حدث خطأ أثناء تقديم طلب التسجيل",
+        description: "حدث خطأ أثناء إنشاء الحساب أو تقديم طلب التسجيل",
         variant: "destructive",
       });
     } finally {
@@ -254,17 +281,15 @@ const Registration = () => {
           
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              {step === 1 && (
-                <StepOne form={form} />
-              )}
-              
-              {step === 2 && (
-                <StepTwo form={form} />
-              )}
-              
-              {step === 3 && (
-                <StepThree handleDocumentUpload={handleDocumentUpload} documents={documents} />
-              )}
+              <div style={{ display: step === 1 ? 'block' : 'none' }}>
+  <StepOne form={form} />
+</div>
+<div style={{ display: step === 2 ? 'block' : 'none' }}>
+  <StepTwo form={form} />
+</div>
+<div style={{ display: step === 3 ? 'block' : 'none' }}>
+  <StepThree handleDocumentUpload={handleDocumentUpload} documents={documents} />
+</div>
               
               <div className="flex justify-between mt-12">
                 {step > 1 && (

@@ -1,8 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
 
 const Header = () => {
   const location = useLocation();
+  const { isAuthenticated, user, logout } = useAuth();
   
   return (
     <header className="bg-white border-b sticky top-0 z-50">
@@ -27,12 +29,24 @@ const Header = () => {
               الرئيسية
             </NavLink>
             <NavLink to="/tracks" isActive={location.pathname.startsWith('/tracks')}>
-              البرامج الدراسية
+              البرامج
             </NavLink>
             <div className="flex items-center gap-8">
-              <NavLink to="/login" isActive={location.pathname === '/login'}>
-                تسجيل الدخول
-              </NavLink>
+              {isAuthenticated ? (
+                <>
+                  <span className="text-sm font-medium text-gray-700">{user?.email}</span>
+                  <button
+                    onClick={logout}
+                    className="text-red-600 hover:text-red-800 border border-red-200 rounded px-3 py-1 ml-2"
+                  >
+                    تسجيل الخروج
+                  </button>
+                </>
+              ) : (
+                <NavLink to="/login" isActive={location.pathname === '/login'}>
+                  تسجيل الدخول
+                </NavLink>
+              )}
               <NavLink to="/registration" isActive={location.pathname === '/registration'}>
                 إنشاء حساب
               </NavLink>

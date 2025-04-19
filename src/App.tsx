@@ -3,6 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/context/AuthContext";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { AnimatePresence } from "framer-motion";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
@@ -33,24 +35,26 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <div className="min-h-screen flex flex-col bg-gray-50">
-          <Header />
-          <main className="flex-1 flex flex-col">
-            <AnimatePresence mode="wait">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/tracks" element={<Tracks />} />
-                <Route path="/tracks/:trackId" element={<TrackDetail />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/registration" element={<StudentRegistration />} />
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/student/dashboard" element={<StudentDashboard />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </AnimatePresence>
-          </main>
-          <Footer />
-        </div>
+        <AuthProvider>
+          <div className="min-h-screen flex flex-col bg-gray-50">
+            <Header />
+            <main className="flex-1 flex flex-col">
+              <AnimatePresence mode="wait">
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/tracks" element={<Tracks />} />
+                  <Route path="/tracks/:trackId" element={<TrackDetail />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/registration" element={<StudentRegistration />} />
+                  <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+                  <Route path="/student/dashboard" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </AnimatePresence>
+            </main>
+            <Footer />
+          </div>
+        </AuthProvider>
       </BrowserRouter>
       <ReactQueryDevtools initialIsOpen={false} />
     </TooltipProvider>

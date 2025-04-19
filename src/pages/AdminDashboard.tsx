@@ -8,7 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
+import { useAuth } from '@/context/AuthContext';
+
 const AdminDashboard = () => {
+  const { user } = useAuth();
   // Mock data for pending applications
   const pendingApplications = [
     { id: 1, name: "أحمد محمد", track: "علوم الحاسوب", date: "2023-09-15", status: "pending" },

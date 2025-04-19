@@ -9,7 +9,10 @@ import PageTransition from "@/components/ui/PageTransition";
 import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, BookIcon, GraduationCapIcon, FileTextIcon, ClockIcon } from "lucide-react";
 
+import { useAuth } from '@/context/AuthContext';
+
 const StudentDashboard = () => {
+  const { user } = useAuth();
   // Mock student data
   const student = {
     name: "أحمد محمد",
