@@ -72,12 +72,12 @@ const Login = () => {
         if (from && from !== '/login') {
           navigate(from, { replace: true });
         } else {
-          navigate('/student/dashboard', { replace: true });
+          navigate('/', { replace: true });
         }
         // Fallback: if navigation fails, force reload
         setTimeout(() => {
           if (window.location.pathname === '/login') {
-            window.location.replace('/student/dashboard');
+            window.location.replace('/');
           }
         }, 500);
       } else {
