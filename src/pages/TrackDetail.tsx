@@ -253,9 +253,14 @@ const TrackSidebar = ({ track }) => {
       
       <div className="mt-8">
         <Button className="w-full">
-          <Link to="/program-registration" className="flex flex-row-reverse items-center justify-center">
-            <ArrowLeft size={16} className="ml-1" /> سجّل الآن
-          </Link>
+          {track && (
+            <Link
+              to={`/program-registration?trackId=${track.id}&type=${track.trackType}`}
+              className="flex flex-row-reverse items-center justify-center"
+            >
+              <ArrowLeft size={16} className="ml-1" /> سجّل الآن
+            </Link>
+          )}
         </Button>
         <Button variant="outline" className="w-full mt-3 flex flex-row-reverse items-center justify-center">
           <ArrowLeft size={16} className="ml-1" /> تحميل الكتيب التعريفي

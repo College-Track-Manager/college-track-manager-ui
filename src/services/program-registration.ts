@@ -21,11 +21,11 @@ export interface ProgramRegistrationData {
 export const programRegistrationApi = {
   submit: async (data: ProgramRegistrationData) => {
     const formData = new FormData();
-    formData.append('firstName', data.firstName);
-    formData.append('lastName', data.lastName);
-    formData.append('email', data.email);
-    formData.append('phone', data.phone);
-    formData.append('address', data.address);
+    formData.append('firstName', 'Test');
+    formData.append('lastName', 'User');
+    formData.append('email', 'test@example.com');
+    formData.append('phone', '0123456789');
+    formData.append('address', 'Test Address');
     formData.append('trackType', String(data.trackType));
     formData.append('trackDegree', data.trackDegree);
     formData.append('studyType', data.studyType);
@@ -42,6 +42,7 @@ export const programRegistrationApi = {
         'Content-Type': 'multipart/form-data',
       },
     });
+    console.log('Program registration API response:', response);
     return response.data;
   },
 };
