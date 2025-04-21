@@ -8,12 +8,13 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useTracksByType, Track, TrackType } from '@/services/tracks';
 
 const Tracks = () => {
-  const [activeTab, setActiveTab] = useState<TrackType>('professional');
+  // 1 = academic, 2 = professional
+  const [activeTab, setActiveTab] = useState<TrackType>(1);
   const [searchQuery, setSearchQuery] = useState('');
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
 
-  // Use tracks by type instead of odd IDs
+  // Fetch tracks by numeric type (1 or 2)
   const { data: tracks = [], isLoading, error } = useTracksByType(activeTab);
 
   // Filter tracks based on search query
@@ -60,16 +61,16 @@ const Tracks = () => {
 
           {/* Tabs Section */}
           <Tabs
-            defaultValue="professional"
+            defaultValue="1"
             className="w-full mt-10"
-            onValueChange={(value) => setActiveTab(value as TrackType)}
+            onValueChange={(value) => setActiveTab(Number(value) as TrackType)}
           >
             <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
-              <TabsTrigger value="academic">البرامج الأكاديمية</TabsTrigger>
-              <TabsTrigger value="professional">البرامج المهنية</TabsTrigger>
+              <TabsTrigger value="2">البرامج المهنية</TabsTrigger>
+              <TabsTrigger value="1">البرامج الأكاديمية</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="academic">
+            <TabsContent value="1">
               <TracksContent 
                 tracks={filteredTracks} 
                 isLoading={isLoading} 
@@ -78,7 +79,7 @@ const Tracks = () => {
               />
             </TabsContent>
 
-            <TabsContent value="professional">
+            <TabsContent value="2">
               <TracksContent 
                 tracks={filteredTracks} 
                 isLoading={isLoading} 

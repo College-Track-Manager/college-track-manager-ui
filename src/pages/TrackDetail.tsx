@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
@@ -7,7 +6,7 @@ import PageTransition from '@/components/ui/PageTransition';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { tracks } from '@/data/tracks';
+import { fetchTrackById } from '@/services/tracks';
 
 const TrackDetail = () => {
   const { trackId } = useParams();
@@ -16,17 +15,20 @@ const TrackDetail = () => {
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    // Simulate loading data
-    const timer = setTimeout(() => {
-      const foundTrack = tracks.find(t => t.id === trackId);
-      if (foundTrack) {
-        setTrack(foundTrack);
+    const loadTrack = async () => {
+      try {
+        const trackData = await fetchTrackById(Number(trackId));
+        setTrack(trackData);
+      } catch (error) {
+        console.error('Error fetching track details:', error);
+        navigate('/tracks', { replace: true });
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    }, 400);
-    
-    return () => clearTimeout(timer);
-  }, [trackId]);
+    };
+
+    loadTrack();
+  }, [trackId, navigate]);
   
   // Handle track not found
   useEffect(() => {
@@ -52,13 +54,13 @@ const TrackDetail = () => {
   
   return (
     <PageTransition>
-      <div className="py-12">
-        <div className="container-content">
+      <div className="py-12" dir="rtl">
+        <div className="container-content text-right">
           <Link 
             to="/tracks" 
-            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="inline-flex flex-row-reverse items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            <ArrowLeft size={16} className="ml-1" /> العودة إلى المسارات
+            العودة إلى المسارات <ArrowLeft size={16} className="mr-1 rotate-180" />
           </Link>
           
           <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -87,8 +89,10 @@ const TrackOverview = ({ track }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
       transition={{ duration: 0.5 }}
+      dir="rtl"
+      className="text-right"
     >
-      <div className="aspect-video rounded-xl overflow-hidden">
+      <div className="aspect-video rounded-xl overflow-hidden" dir="rtl">
         <img 
           src={track.image} 
           alt={track.title}
@@ -96,24 +100,24 @@ const TrackOverview = ({ track }) => {
         />
       </div>
       
-      <h1 className="mt-6 text-3xl md:text-4xl font-bold">{track.title}</h1>
+      <h1 className="mt-6 text-3xl md:text-4xl font-bold text-right" dir="rtl">{track.title}</h1>
+
+<div className="mt-4 flex flex-row-reverse gap-2 justify-end text-right" dir="rtl">
+  <div className="flex items-center bg-secondary/60 rounded-full px-4 py-1 text-sm">
+    <Clock size={16} className="ml-1 text-muted-foreground" />
+    <span>{track.duration}</span>
+  </div>
+  <div className="flex items-center bg-secondary/60 rounded-full px-4 py-1 text-sm">
+    <FileText size={16} className="ml-1 text-muted-foreground" />
+    <span>{track.courses?.length || 0} دورات</span>
+  </div>
+  <div className="flex items-center bg-secondary/60 rounded-full px-4 py-1 text-sm">
+    <GraduationCap size={16} className="ml-1 text-muted-foreground" />
+    <span>شهادة مهنية</span>
+  </div>
+</div>
       
-      <div className="mt-4 flex flex-wrap gap-4">
-        <div className="flex items-center text-sm">
-          <Clock size={16} className="ml-1.5 text-muted-foreground" />
-          <span>{track.duration}</span>
-        </div>
-        <div className="flex items-center text-sm">
-          <FileText size={16} className="ml-1.5 text-muted-foreground" />
-          <span>{track.courses.length} دورات</span>
-        </div>
-        <div className="flex items-center text-sm">
-          <GraduationCap size={16} className="ml-1.5 text-muted-foreground" />
-          <span>شهادة مهنية</span>
-        </div>
-      </div>
-      
-      <p className="mt-6 text-lg">{track.fullDescription}</p>
+      <p className="mt-6 text-lg text-right" dir="rtl">{track.fullDescription}</p>
     </motion.div>
   );
 };
@@ -121,6 +125,7 @@ const TrackOverview = ({ track }) => {
 const TrackTabs = ({ track }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
+  const [activeTab, setActiveTab] = useState('careers');
   
   return (
     <motion.div
@@ -130,40 +135,44 @@ const TrackTabs = ({ track }) => {
       transition={{ duration: 0.5, delay: 0.2 }}
       className="mt-12"
     >
-      <Tabs defaultValue="courses">
+      <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="careers">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="courses">الدورات</TabsTrigger>
           <TabsTrigger value="requirements">المتطلبات</TabsTrigger>
           <TabsTrigger value="careers">الآفاق المهنية</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="courses" className="mt-6">
+        <TabsContent value="courses" className="mt-6 text-right" dir="rtl">
           <div className="space-y-6">
-            {track.courses.map((course) => (
-              <div key={course.id} className="bg-secondary/30 p-6 rounded-lg">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-semibold">{course.title}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">{course.description}</p>
-                  </div>
-                  <div className="text-sm bg-secondary px-2 py-1 rounded-full">
-                    {course.credits} ساعات معتمدة
-                  </div>
+            {Array.isArray(track.courses) && track.courses.length > 0 ? (
+              track.courses.map((course) => (
+                <div key={course.id} className="bg-secondary/30 p-6 rounded-lg text-right" dir="rtl">
+                  <div className="flex flex-row-reverse items-start">
+  <div className="text-sm bg-secondary px-2 py-1 rounded-full flex-shrink-0" style={{ minWidth: 90, textAlign: 'center' }}>
+    {course.credits} ساعات معتمدة
+  </div>
+  <div className="flex-1 mr-4">
+    <h3 className="font-semibold">{course.title}</h3>
+    <p className="mt-1 text-sm text-muted-foreground">{course.description}</p>
+  </div>
+</div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div className="text-center text-muted-foreground py-8">لا توجد دورات متاحة لهذا البرنامج حالياً.</div>
+            )}
           </div>
         </TabsContent>
         
-        <TabsContent value="requirements" className="mt-6">
-          <div className="bg-secondary/30 p-6 rounded-lg">
+        <TabsContent value="requirements" className="mt-6 text-right" dir="rtl">
+          <div className="bg-secondary/30 p-6 rounded-lg text-right" dir="rtl">
             <h3 className="font-semibold">متطلبات القبول</h3>
             <ul className="mt-4 space-y-3">
               {track.requirements.map((requirement, index) => (
-                <li key={index} className="flex">
-                  <CheckCircle size={18} className="ml-2 flex-shrink-0 text-primary" />
-                  <span>{requirement}</span>
-                </li>
+                <li key={index} className="flex flex-row-reverse items-center text-right mb-2" dir="rtl">
+  <span className="flex-1">{requirement}</span>
+  <CheckCircle size={18} className="ml-2 flex-shrink-0 text-primary" />
+</li>
               ))}
             </ul>
             <Separator className="my-6" />
@@ -173,9 +182,9 @@ const TrackTabs = ({ track }) => {
           </div>
         </TabsContent>
         
-        <TabsContent value="careers" className="mt-6">
-          <div className="bg-secondary/30 p-6 rounded-lg">
-            <div className="flex items-start">
+        <TabsContent value="careers" className="mt-6 text-right" dir="rtl">
+          <div className="bg-secondary/30 p-6 rounded-lg text-right" dir="rtl">
+            <div className="flex flex-row-reverse items-start">
               <Briefcase size={24} className="ml-3 text-primary" />
               <div>
                 <h3 className="font-semibold">الفرص المهنية</h3>
@@ -187,10 +196,10 @@ const TrackTabs = ({ track }) => {
               <h4 className="font-medium">المسارات المهنية المحتملة:</h4>
               <ul className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
                 {[1, 2, 3, 4].map((_, i) => (
-                  <li key={i} className="flex items-center">
-                    <CheckCircle size={16} className="ml-2 text-primary" />
-                    <span>الدور المهني {i + 1}</span>
-                  </li>
+                  <li key={i} className="flex flex-row-reverse items-center text-right mb-2" dir="rtl">
+  <span className="flex-1">الدور المهني {i + 1}</span>
+  <CheckCircle size={16} className="ml-2 text-primary" />
+</li>
                 ))}
               </ul>
             </div>
@@ -244,12 +253,17 @@ const TrackSidebar = ({ track }) => {
       
       <div className="mt-8">
         <Button className="w-full">
-          <Link to="/registration" className="flex items-center justify-center">
-            سجّل الآن <ArrowRight size={16} className="mr-1" />
-          </Link>
+          {track && (
+            <Link
+              to={`/program-registration?trackId=${track.id}&type=${track.trackType}`}
+              className="flex flex-row-reverse items-center justify-center"
+            >
+              <ArrowLeft size={16} className="ml-1" /> سجّل الآن
+            </Link>
+          )}
         </Button>
-        <Button variant="outline" className="w-full mt-3">
-          تحميل الكتيب التعريفي
+        <Button variant="outline" className="w-full mt-3 flex flex-row-reverse items-center justify-center">
+          <ArrowLeft size={16} className="ml-1" /> تحميل الكتيب التعريفي
         </Button>
       </div>
       
