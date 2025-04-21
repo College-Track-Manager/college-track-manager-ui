@@ -48,6 +48,9 @@
   }
 
   body {
+  direction: rtl;
+  text-align: right;
+
     @apply bg-background text-foreground;
     font-family: 'Tajawal', sans-serif;
   }

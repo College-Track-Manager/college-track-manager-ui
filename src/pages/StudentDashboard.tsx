@@ -9,15 +9,18 @@ import PageTransition from "@/components/ui/PageTransition";
 import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, BookIcon, GraduationCapIcon, FileTextIcon, ClockIcon } from "lucide-react";
 
+import { useAuth } from '@/context/AuthContext';
+
 const StudentDashboard = () => {
-  // Mock student data
+  const { user } = useAuth();
+  // Use logged-in user info from AuthContext
   const student = {
-    name: "أحمد محمد",
-    email: "ahmed.mohammed@example.com",
-    track: "علوم الحاسوب",
-    enrollmentDate: "١٥ سبتمبر ٢٠٢٣",
-    progress: 35,
-    avatar: "/placeholder.svg",
+    name: user?.name || user?.fullName || "طالب",
+    email: user?.email || "",
+    track: user?.track || "-",
+    enrollmentDate: user?.enrollmentDate || "-",
+    progress: user?.progress || 0,
+    avatar: user?.avatar || "/placeholder.svg",
   };
 
   // Mock courses data
@@ -90,6 +93,9 @@ const StudentDashboard = () => {
                 <div className="flex items-center gap-2 mt-1">
                   <Badge variant="outline">{student.track}</Badge>
                   <Badge variant="outline" className="bg-primary/10">التسجيل: {student.enrollmentDate}</Badge>
+                  {user && (
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">معرّف المستخدم: {user.sub || user.id || user.userId || ''}</Badge>
+                  )}
                 </div>
               </div>
             </CardHeader>

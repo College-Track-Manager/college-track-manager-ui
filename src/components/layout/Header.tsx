@@ -1,8 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
 
 const Header = () => {
   const location = useLocation();
+  const { isAuthenticated, user, logout } = useAuth();
   
   return (
     <header className="bg-white border-b sticky top-0 z-50">
@@ -27,15 +29,43 @@ const Header = () => {
               الرئيسية
             </NavLink>
             <NavLink to="/tracks" isActive={location.pathname.startsWith('/tracks')}>
-              البرامج الدراسية
+              البرامج
             </NavLink>
             <div className="flex items-center gap-8">
-              <NavLink to="/login" isActive={location.pathname === '/login'}>
-                تسجيل الدخول
-              </NavLink>
-              <NavLink to="/registration" isActive={location.pathname === '/registration'}>
-                إنشاء حساب
-              </NavLink>
+              {isAuthenticated ? (
+                <>
+                  {user?.track && (
+                    <NavLink to="/student/dashboard" isActive={location.pathname.startsWith('/student/dashboard')}>
+                      مقرراتى
+                    </NavLink>
+                  )}
+                  <NavLink to="/profile" isActive={location.pathname === '/profile'}>
+                    الملف الشخصى
+                  </NavLink>
+                  <NavLink to="/program-registration" isActive={location.pathname === '/program-registration'}>
+                    تسجيل البرامج
+                  </NavLink>
+                  <button
+                    onClick={logout}
+                    className={cn(
+                      "text-base transition-colors relative py-2",
+                      "text-gray-600 hover:text-gray-900"
+                    )}
+                    style={{ background: "none", border: "none", padding: 0, margin: 0, cursor: "pointer" }}
+                  >
+                    تسجيل الخروج
+                  </button>
+                </>
+              ) : (
+                <NavLink to="/login" isActive={location.pathname === '/login'}>
+                  تسجيل الدخول
+                </NavLink>
+              )}
+              {!isAuthenticated && (
+                <NavLink to="/registration" isActive={location.pathname === '/registration'}>
+                  إنشاء حساب
+                </NavLink>
+              )}
             </div>
           </nav>
         </div>
