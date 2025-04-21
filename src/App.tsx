@@ -19,6 +19,8 @@ import Registration from "./pages/Registration";
 import AdminDashboard from "./pages/AdminDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
 import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
+import ProgramRegistration from "./pages/ProgramRegistration";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,6 +51,8 @@ const App = () => (
                   <Route path="/registration" element={<Registration />} />
                   <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
                   <Route path="/student/dashboard" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
+                  <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                  <Route path="/program-registration" element={<ProtectedRoute><ProgramRegistration /></ProtectedRoute>} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </AnimatePresence>

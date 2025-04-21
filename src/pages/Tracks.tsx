@@ -9,7 +9,7 @@ import { useTracksByType, Track, TrackType } from '@/services/tracks';
 
 const Tracks = () => {
   // 1 = academic, 2 = professional
-  const [activeTab, setActiveTab] = useState<TrackType>(2);
+  const [activeTab, setActiveTab] = useState<TrackType>(1);
   const [searchQuery, setSearchQuery] = useState('');
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
@@ -66,7 +66,7 @@ const Tracks = () => {
             onValueChange={(value) => setActiveTab(Number(value) as TrackType)}
           >
             <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
-            <TabsTrigger value="2">البرامج المهنية</TabsTrigger>
+              <TabsTrigger value="2">البرامج المهنية</TabsTrigger>
               <TabsTrigger value="1">البرامج الأكاديمية</TabsTrigger>
             </TabsList>
 

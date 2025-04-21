@@ -71,7 +71,7 @@ const AboutSection = () => {
 const ProgramsTabsSection = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
-  const [activeTab, setActiveTab] = useState<'professional' | 'academic'>('professional');
+  const [activeTab, setActiveTab] = useState<'professional' | 'academic'>('academic');
   
   const { data: tracks = [], isLoading } = useTracksByType(activeTab);
 
