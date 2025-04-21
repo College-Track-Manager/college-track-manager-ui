@@ -32,6 +32,13 @@ import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 
 const Login = () => {
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [changePwForm, setChangePwForm] = useState({
+    email: '',
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
@@ -160,6 +167,16 @@ const Login = () => {
               </Button>
 
               <p className="text-center text-sm text-muted-foreground">
+                <button
+                  type="button"
+                  className="text-blue-700 hover:underline font-medium mb-2"
+                  style={{ direction: 'rtl' }}
+                  onClick={() => setShowChangePassword(true)}
+                >
+                  تغيير كلمة المرور
+                </button>
+              </p>
+              <p className="text-center text-sm text-muted-foreground">
                 ليس لديك حساب؟{' '}
                 <button
                   type="button"
@@ -169,6 +186,66 @@ const Login = () => {
                   إنشاء حساب جديد
                 </button>
               </p>
+
+              {/* Change Password Modal */}
+              {showChangePassword && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                  <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md relative" dir="rtl">
+                    <button
+                      className="absolute left-4 top-4 text-gray-500 hover:text-gray-700 text-2xl"
+                      onClick={() => setShowChangePassword(false)}
+                      aria-label="إغلاق"
+                    >
+                      ×
+                    </button>
+                    <h2 className="text-xl font-bold mb-4 text-center">تغيير كلمة المرور</h2>
+                    <form
+                      className="space-y-4"
+                      onSubmit={e => {
+                        e.preventDefault();
+                        // Log values for now
+                        console.log('Change Password:', changePwForm);
+                        setShowChangePassword(false);
+                        toast.success('تم إرسال طلب تغيير كلمة المرور');
+                      }}
+                    >
+                      <Input
+                        type="email"
+                        required
+                        placeholder="البريد الإلكتروني"
+                        className="w-full"
+                        value={changePwForm.email}
+                        onChange={e => setChangePwForm(f => ({ ...f, email: e.target.value }))}
+                      />
+                      <Input
+                        type="password"
+                        required
+                        placeholder="كلمة المرور الحالية"
+                        className="w-full"
+                        value={changePwForm.oldPassword}
+                        onChange={e => setChangePwForm(f => ({ ...f, oldPassword: e.target.value }))}
+                      />
+                      <Input
+                        type="password"
+                        required
+                        placeholder="كلمة المرور الجديدة"
+                        className="w-full"
+                        value={changePwForm.newPassword}
+                        onChange={e => setChangePwForm(f => ({ ...f, newPassword: e.target.value }))}
+                      />
+                      <Input
+                        type="password"
+                        required
+                        placeholder="تأكيد كلمة المرور الجديدة"
+                        className="w-full"
+                        value={changePwForm.confirmPassword}
+                        onChange={e => setChangePwForm(f => ({ ...f, confirmPassword: e.target.value }))}
+                      />
+                      <Button type="submit" className="w-full bg-primary text-white mt-2">تغيير كلمة المرور</Button>
+                    </form>
+                  </div>
+                </div>
+              )}
             </form>
           </Form>
         </CardContent>
