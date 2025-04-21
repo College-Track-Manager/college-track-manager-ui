@@ -34,12 +34,24 @@ const Header = () => {
             <div className="flex items-center gap-8">
               {isAuthenticated ? (
                 <>
-                  <NavLink to="/student/dashboard" isActive={location.pathname.startsWith('/student/dashboard')}>
-                    لوحة التحكم
+                  {user?.track && (
+                    <NavLink to="/student/dashboard" isActive={location.pathname.startsWith('/student/dashboard')}>
+                      مقرراتى
+                    </NavLink>
+                  )}
+                  <NavLink to="/profile" isActive={location.pathname === '/profile'}>
+                    الملف الشخصى
+                  </NavLink>
+                  <NavLink to="/program-registration" isActive={location.pathname === '/program-registration'}>
+                    تسجيل البرامج
                   </NavLink>
                   <button
                     onClick={logout}
-                    className="text-red-600 hover:text-red-800 border border-red-200 rounded px-3 py-1 ml-2"
+                    className={cn(
+                      "text-base transition-colors relative py-2",
+                      "text-gray-600 hover:text-gray-900"
+                    )}
+                    style={{ background: "none", border: "none", padding: 0, margin: 0, cursor: "pointer" }}
                   >
                     تسجيل الخروج
                   </button>
@@ -49,9 +61,11 @@ const Header = () => {
                   تسجيل الدخول
                 </NavLink>
               )}
-              <NavLink to="/registration" isActive={location.pathname === '/registration'}>
-                إنشاء حساب
-              </NavLink>
+              {!isAuthenticated && (
+                <NavLink to="/registration" isActive={location.pathname === '/registration'}>
+                  إنشاء حساب
+                </NavLink>
+              )}
             </div>
           </nav>
         </div>

@@ -56,16 +56,7 @@ const Login = () => {
         login(response.token); // Immediate auth context update
         console.log('Token after login():', localStorage.getItem('token'));
 
-        toast.success('تم تسجيل الدخول بنجاح', {
-          description: 'مرحباً بك في لوحة التحكم',
-          duration: 5000,
-          icon: <CheckCircle className="h-5 w-5 text-green-500" />, 
-          style: {
-            background: '#f0fdf4',
-            border: '1px solid #86efac',
-            color: '#166534',
-          },
-        });
+
         // Robust redirection: avoid redirecting back to /login or undefined
         const from = (location.state as any)?.from?.pathname;
         console.log('Navigating to:', from);

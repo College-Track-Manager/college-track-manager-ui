@@ -11,12 +11,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { tracks } from '@/data/tracks';
+import { useTracksByType } from '@/services/tracks';
 import { useNavigate } from 'react-router-dom';
-import { registrationsApi } from '@/services/registrations';
+import { programRegistrationApi } from '@/services/program-registration';
 
 // Define schema for program registration (step 2 & 3 fields)
 const programSchema = z.object({
+  trackType: z.union([z.literal(1), z.literal(2)]).default(1),
   track: z.string().min(1, { message: 'الرجاء اختيار مسار' }),
   educationLevel: z.string().min(1, { message: 'الرجاء اختيار المرحلة الدراسية' }),
   education: z.string().min(5, { message: 'الخلفية التعليمية مطلوبة' }),
@@ -26,7 +27,6 @@ const programSchema = z.object({
 type ProgramFormValues = z.infer<typeof programSchema>;
 
 const ProgramRegistration = () => {
-  const [step, setStep] = useState(2); // Only steps 2 and 3
   const [documents, setDocuments] = useState({
     resume: null,
     transcript: null,
@@ -39,6 +39,7 @@ const ProgramRegistration = () => {
   const form = useForm<ProgramFormValues>({
     resolver: zodResolver(programSchema),
     defaultValues: {
+      trackType: 1, // Academic by default
       track: '',
       educationLevel: '',
       education: '',
@@ -46,13 +47,17 @@ const ProgramRegistration = () => {
     },
   });
 
+  // Watch trackType for dynamic fetching
+  const trackType = form.watch('trackType');
+  const { data: tracks = [], isLoading: tracksLoading } = useTracksByType(trackType);
+
   const handleDocumentUpload = (type, e) => {
     const file = e.target.files[0];
     if (file) {
-      setDocuments({
-        ...documents,
+      setDocuments((prevDocs) => ({
+        ...prevDocs,
         [type]: file,
-      });
+      }));
       toast({
         title: "تم رفع المستند",
         description: `تم رفع ${file.name} بنجاح.`,
@@ -60,28 +65,6 @@ const ProgramRegistration = () => {
     }
   };
 
-  const nextStep = () => {
-    if (step === 2) {
-      form.trigger(['track', 'educationLevel', 'education', 'statement']);
-      const errorField = ['track', 'educationLevel', 'education', 'statement'].find(
-        (field) => !!form.formState.errors[field as keyof typeof form.formState.errors]
-      );
-      if (errorField) {
-        const el = document.querySelector(`[name="${errorField}"]`);
-        if (el && 'focus' in el) (el as HTMLElement).focus();
-        return;
-      }
-      setStep(3);
-      window.scrollTo(0, 0);
-    }
-  };
-
-  const prevStep = () => {
-    if (step > 2) {
-      setStep(step - 1);
-      window.scrollTo(0, 0);
-    }
-  };
 
   const onSubmit = async (data: ProgramFormValues) => {
     if (!documents.resume || !documents.transcript || !documents.idCard) {
@@ -95,16 +78,34 @@ const ProgramRegistration = () => {
     setIsSubmitting(true);
     window.scrollTo(0, 0);
     try {
-      // Prepare FormData for program registration
-      const formDataToSubmit = new FormData();
-      formDataToSubmit.append('Track', data.track);
-      formDataToSubmit.append('EducationLevel', data.educationLevel);
-      formDataToSubmit.append('Education', data.education);
-      formDataToSubmit.append('Statement', data.statement);
-      if (documents.resume) formDataToSubmit.append('resume', documents.resume);
-      if (documents.transcript) formDataToSubmit.append('transcript', documents.transcript);
-      if (documents.idCard) formDataToSubmit.append('idCard', documents.idCard);
-      await registrationsApi.submit(formDataToSubmit);
+      // Submit new program registration
+      // Get user info from JWT token
+      const token = localStorage.getItem('token');
+      let userInfo: any = {};
+      if (token) {
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          userInfo = payload;
+        } catch (e) {
+          console.error('Failed to decode token', e);
+        }
+      }
+      await programRegistrationApi.submit({
+        firstName: userInfo.firstName || '',
+        lastName: userInfo.lastName || '',
+        email: userInfo.email || '',
+        phone: userInfo.phone || '',
+        address: userInfo.address || '',
+        studyType: userInfo.studyType || '',
+        trackType: data.trackType,
+        trackDegree: data.educationLevel,
+        track: data.track,
+        education: data.education,
+        statement: data.statement,
+        resume: documents.resume,
+        transcript: documents.transcript,
+        idCard: documents.idCard,
+      });
       toast({
         title: "تم تقديم الطلب",
         description: "تم تقديم طلب البرنامج بنجاح وهو قيد المراجعة.",
@@ -133,29 +134,126 @@ const ProgramRegistration = () => {
           </div>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <div style={{ display: step === 2 ? 'block' : 'none' }}>
-                {/* StepTwo UI here (track, education, statement) */}
-                {/* ... You can extract your StepTwo component here ... */}
-              </div>
-              <div style={{ display: step === 3 ? 'block' : 'none' }}>
-                {/* StepThree UI here (document upload) */}
-                {/* ... You can extract your StepThree component here ... */}
-              </div>
-              <div className="flex justify-between mt-12">
-                {step > 2 && (
-                  <Button type="button" variant="outline" onClick={prevStep}>
-                    السابق
-                  </Button>
+
+
+
+
+
+
+              <FormField
+                control={form.control}
+                name="trackType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>نوع المسار</FormLabel>
+                    <Select
+                      onValueChange={(val) => field.onChange(Number(val))}
+                      value={String(field.value)}
+                      name="trackType"
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر نوع المسار" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">أكاديمي</SelectItem>
+                        <SelectItem value="2">مهني</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
                 )}
-                {step < 3 ? (
-                  <Button type="button" onClick={nextStep} className="mr-auto">
-                    متابعة <ChevronLeft size={16} className="mr-1" />
-                  </Button>
-                ) : (
-                  <Button type="submit" className="mr-auto" disabled={isSubmitting}>
-                    {isSubmitting ? 'جاري التقديم...' : 'تقديم الطلب'}
-                  </Button>
+              />
+              <FormField
+                control={form.control}
+                name="track"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>المسار</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value} name="track" disabled={tracksLoading || tracks.length === 0}>
+                      <SelectTrigger>
+                        <SelectValue placeholder={tracksLoading ? "جاري تحميل المسارات..." : "اختر المسار"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {tracks.map((track) => (
+                          <SelectItem key={track.id} value={String(track.id)}>{track.title}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
                 )}
+              />
+              <FormField
+                control={form.control}
+                name="educationLevel"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>المرحلة الدراسية</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value} name="educationLevel">
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر المرحلة الدراسية" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="bachelor">دبلوما</SelectItem>
+                        <SelectItem value="master">ماجستير</SelectItem>
+                        <SelectItem value="phd">دكتوراه</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="education"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>الخلفية التعليمية</FormLabel>
+                    <FormControl>
+                      <Input {...field} name="education" placeholder="أدخل الخلفية التعليمية" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="statement"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>الرسالة الشخصية</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} name="statement" placeholder="أدخل رسالتك الشخصية" rows={5} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div>
+                <FormLabel>رفع السيرة الذاتية</FormLabel>
+                <Input type="file" accept=".pdf,.doc,.docx" onChange={(e) => handleDocumentUpload('resume', e)} />
+                {documents.resume && (
+                  <div className="text-green-600 mt-1 flex items-center gap-1"><CheckCircle size={16} /> {documents.resume.name}</div>
+                )}
+              </div>
+              <div>
+                <FormLabel>رفع كشف الدرجات</FormLabel>
+                <Input type="file" accept=".pdf,.doc,.docx" onChange={(e) => handleDocumentUpload('transcript', e)} />
+                {documents.transcript && (
+                  <div className="text-green-600 mt-1 flex items-center gap-1"><CheckCircle size={16} /> {documents.transcript.name}</div>
+                )}
+              </div>
+              <div>
+                <FormLabel>رفع بطاقة الهوية</FormLabel>
+                <Input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => handleDocumentUpload('idCard', e)} />
+                {documents.idCard && (
+                  <div className="text-green-600 mt-1 flex items-center gap-1"><CheckCircle size={16} /> {documents.idCard.name}</div>
+                )}
+              </div>
+              <div className="flex justify-end mt-12">
+                <Button type="submit" className="mr-auto" disabled={isSubmitting}>
+                  {isSubmitting ? 'جاري التقديم...' : 'تقديم الطلب'}
+                </Button>
               </div>
             </form>
           </Form>
