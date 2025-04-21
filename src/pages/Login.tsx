@@ -107,8 +107,11 @@ const Login = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-5rem)] flex items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      {/* Header placeholder - replace with your actual header component if needed */}
+      {/* <Header /> */}
+      <main className="flex-1 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8">
+        <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">تسجيل الدخول</CardTitle>
           <CardDescription className="text-center">
@@ -249,7 +252,10 @@ const Login = () => {
             </form>
           </Form>
         </CardContent>
-      </Card>
+        </Card>
+      </main>
+      {/* Footer placeholder - replace with your actual footer component if needed */}
+      {/* <Footer /> */}
     </div>
   );
 };

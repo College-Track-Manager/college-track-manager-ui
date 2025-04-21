@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { CheckCircle } from 'lucide-react';
+import { RegistrationFields } from './RegistrationFields';
 import PageTransition from '@/components/ui/PageTransition';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +19,9 @@ const registrationSchema = z.object({
     .regex(/^[\u0600-\u06FFa-zA-Z\s]+$/, { message: 'الاسم الأول يجب أن يحتوي على حروف فقط' }),
   lastName: z.string().min(2, { message: 'الاسم الأخير مطلوب' }),
   email: z.string().email({ message: 'عنوان البريد الإلكتروني غير صالح' }),
-  phone: z.string().min(10, { message: 'رقم هاتف صالح مطلوب' }),
+  phone: z.string()
+    .length(11, { message: 'رقم الهاتف يجب أن يتكون من 11 رقم' })
+    .regex(/^[0-9]+$/, { message: 'رقم الهاتف يجب أن يحتوي على أرقام فقط' }),
   nationalId: z.string().length(14, { message: 'الرقم القومي يجب أن يتكون من ١٤ رقم' }).regex(/^[0-9]+$/, { message: 'الرقم القومي يجب أن يحتوي على أرقام فقط' }),
   address: z.string().min(5, { message: 'العنوان مطلوب' }),
   password: z.string().min(6, { message: 'كلمة المرور مطلوبة ويجب أن تكون 6 أحرف على الأقل' }),
@@ -72,11 +76,26 @@ const Registration = () => {
         setIsSubmitting(false);
         return;
       }
-      alert("تم إنشاء الحساب بنجاح. يمكنك الآن تسجيل الدخول.");
       setFormSubmitted(true);
-      navigate('/login');
-    } catch (error) {
-      alert("حدث خطأ أثناء إنشاء الحساب");
+      // Do not navigate immediately, let user see the success UI
+    } catch (error: any) {
+      // If backend returns validation errors, show the first error for password
+      if (error?.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        // Set error for password field
+        const passwordError = error.response.data.errors.find((err: any) => err.code && err.description && err.code.toLowerCase().includes('password') && !err.code.toLowerCase().includes('confirmpassword'));
+        if (passwordError) {
+          form.setError('password', { type: 'manual', message: passwordError.description });
+        }
+        // Set error for email/username taken
+        const emailError = error.response.data.errors.find((err: any) =>
+          err.code && err.description &&
+          (err.code.toLowerCase().includes('email') || err.code.toLowerCase().includes('username')) &&
+          (err.description.toLowerCase().includes('taken') || err.description.toLowerCase().includes('مستخدم'))
+        );
+        if (emailError) {
+          form.setError('email', { type: 'manual', message: emailError.description });
+        }
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -94,125 +113,14 @@ const Registration = () => {
 
   return (
     <PageTransition>
-      <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
-        <h1 className="text-2xl font-bold mb-6 text-center">تسجيل حساب جديد</h1>
+      <div className="max-w-2xl mx-auto mt-10 p-8 bg-white rounded-xl shadow-lg">
+        <h1 className="text-3xl font-bold mb-8 text-center text-blue-700">تسجيل حساب جديد</h1>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="firstName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>الاسم الأول</FormLabel>
-                  <FormControl>
-                    <Input placeholder="الاسم الأول" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="lastName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>الاسم الأخير</FormLabel>
-                  <FormControl>
-                    <Input placeholder="الاسم الأخير" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>البريد الإلكتروني</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="your@email.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>رقم الهاتف</FormLabel>
-                  <FormControl>
-                    <Input placeholder="رقم الهاتف" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="nationalId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>الرقم القومي</FormLabel>
-                  <FormControl>
-                    <Input placeholder="الرقم القومي" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>العنوان</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="عنوانك" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>كلمة المرور</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="كلمة المرور" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>تأكيد كلمة المرور</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="تأكيد كلمة المرور" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* Debug: Show validation errors */}
-            {Object.values(form.formState.errors).length > 0 && (
-              <div style={{ color: 'red', marginBottom: 16 }}>
-                {Object.entries(form.formState.errors).map(([field, error]) => (
-                  <div key={field}>{field}: {(error as any)?.message}</div>
-                ))}
-              </div>
-            )}
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <RegistrationFields control={form.control} />
             {/* Debug: Show when submitting */}
             {isSubmitting && <div style={{ color: 'blue', marginBottom: 8 }}>Submitting...</div>}
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button type="submit" className="w-full mt-8" disabled={isSubmitting}>
               {isSubmitting ? 'جاري إنشاء الحساب...' : 'إنشاء الحساب'}
             </Button>
           </form>
