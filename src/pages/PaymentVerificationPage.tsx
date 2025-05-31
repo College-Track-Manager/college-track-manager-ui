@@ -2,15 +2,24 @@ import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { FormError } from '@/components/ui/form-error';
+import { RegistrationConfirmationDialog } from '@/components/ui/registration-confirmation-dialog';
 
 interface PaymentVerificationPageProps {
   // Add props if needed
+}
+
+interface PaymentStatus {
+  verified: boolean;
+  studentName?: string;
+  canConfirmRegistration?: boolean;
 }
 
 export const PaymentVerificationPage: React.FC<PaymentVerificationPageProps> = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | null>(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const handleSearch = async () => {
     if (!searchTerm.trim()) {
@@ -22,10 +31,15 @@ export const PaymentVerificationPage: React.FC<PaymentVerificationPageProps> = (
     setError('');
 
     try {
-      // Add your API call here
+      // Simulate API call
       // const result = await api.verifyPayment(searchTerm);
       
-      // Handle success
+      // Mock response for demonstration
+      setPaymentStatus({
+        verified: true,
+        studentName: 'أحمد محمد',
+        canConfirmRegistration: true
+      });
     } catch (err) {
       setError('حدث خطأ أثناء التحقق من الدفع. الرجاء المحاولة مرة أخرى.');
     } finally {
@@ -53,13 +67,36 @@ export const PaymentVerificationPage: React.FC<PaymentVerificationPageProps> = (
 
           <Button
             onClick={handleSearch}
-            className="w-full"
+            className="w-full mb-4"
             disabled={loading}
           >
             {loading ? 'جاري التحقق...' : 'تحقق من الدفع'}
           </Button>
+
+          {paymentStatus?.verified && (
+            <div className="space-y-4 border-t pt-4 mt-4">
+              <div className="text-center text-green-600 font-semibold">
+                تم التحقق من الدفع بنجاح
+              </div>
+              {paymentStatus.canConfirmRegistration && (
+                <Button
+                  onClick={() => setShowConfirmation(true)}
+                  className="w-full"
+                  variant="secondary"
+                >
+                  تأكيد التسجيل
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       </div>
+
+      <RegistrationConfirmationDialog
+        isOpen={showConfirmation}
+        onClose={() => setShowConfirmation(false)}
+        studentName={paymentStatus?.studentName}
+      />
     </div>
   );
 };
