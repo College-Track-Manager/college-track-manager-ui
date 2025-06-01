@@ -107,9 +107,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Header placeholder - replace with your actual header component if needed */}
-      {/* <Header /> */}
+    <div className="items-center px-4 py-8 text-center mt-5">
       <main className="flex-1 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8">
         <Card className="w-full max-w-md">
         <CardHeader>
@@ -172,7 +170,7 @@ const Login = () => {
               <p className="text-center text-sm text-muted-foreground">
                 <button
                   type="button"
-                  className="text-blue-700 hover:underline font-medium mb-2"
+                  className="text-blue-700 hover:underline font-medium"
                   style={{ direction: 'rtl' }}
                   onClick={() => setShowChangePassword(true)}
                 >
@@ -206,7 +204,6 @@ const Login = () => {
                       className="space-y-4"
                       onSubmit={e => {
                         e.preventDefault();
-                        // Log values for now
                         console.log('Change Password:', changePwForm);
                         setShowChangePassword(false);
                         toast.success('تم إرسال طلب تغيير كلمة المرور');
@@ -254,8 +251,6 @@ const Login = () => {
         </CardContent>
         </Card>
       </main>
-      {/* Footer placeholder - replace with your actual footer component if needed */}
-      {/* <Footer /> */}
     </div>
   );
 };
