@@ -141,8 +141,24 @@ export const PaymentsPage = () => {
     }
   };
 
+  const formatCurrency = (amount: number, currency: 'EGP' | 'USD' | 'SAR') => {
+    const localeMap = {
+      EGP: 'ar-EG',
+      USD: 'en-US',
+      SAR: 'ar-SA'
+    };
+    return new Intl.NumberFormat(localeMap[currency], {
+      style: 'currency',
+      currency: currency
+    }).format(amount);
+  };
+
   const totalAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
-  const formattedAmount = new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(totalAmount);
+  const formattedAmounts = {
+    egp: formatCurrency(totalAmount, 'EGP'),
+    usd: formatCurrency(totalAmount, 'USD'),
+    sar: formatCurrency(totalAmount, 'SAR')
+  };
 
   return (
     <PageTransition>
@@ -150,7 +166,14 @@ export const PaymentsPage = () => {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">المدفوعات</h1>
-            <p className="text-gray-500 mt-1">إجمالي المدفوعات: {formattedAmount}</p>
+            <div className="text-gray-500 mt-1 space-y-1">
+              <p>إجمالي المدفوعات:</p>
+              <ul className="list-disc list-inside space-y-1 pr-4">
+                <li>جنيه مصري: {formattedAmounts.egp}</li>
+                <li>دولار أمريكي: {formattedAmounts.usd}</li>
+                <li>ريال سعودي: {formattedAmounts.sar}</li>
+              </ul>
+            </div>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => {
@@ -158,7 +181,9 @@ export const PaymentsPage = () => {
                 p.id,
                 p.studentName,
                 p.email,
-                p.amount,
+                formatCurrency(p.amount, 'EGP'),
+                formatCurrency(p.amount, 'USD'),
+                formatCurrency(p.amount, 'SAR'),
                 p.paymentMethod,
                 statusMap[p.status].text,
                 p.date
@@ -271,8 +296,10 @@ export const PaymentsPage = () => {
                 <TableCell>{payment.id}</TableCell>
                 <TableCell>{payment.studentName}</TableCell>
                 <TableCell>{payment.email}</TableCell>
-                <TableCell>
-                  {new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(payment.amount)}
+                <TableCell className="space-y-1">
+                  <div>{formatCurrency(payment.amount, 'EGP')}</div>
+                  <div className="text-sm text-gray-500">{formatCurrency(payment.amount, 'USD')}</div>
+                  <div className="text-sm text-gray-500">{formatCurrency(payment.amount, 'SAR')}</div>
                 </TableCell>
                 <TableCell>{payment.paymentMethod}</TableCell>
                 <TableCell>
