@@ -3,10 +3,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/context/AuthContext";
+import { AuthProvider } from "@/lib/auth";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { AnimatePresence } from "framer-motion";
-import Header from "./components/layout/header";
+import { Header } from "@/components/layout/header";
 import Footer from "./components/layout/Footer";
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
@@ -18,13 +18,13 @@ import StudentRegistration from "./pages/StudentRegistration";
 import Registration from "./pages/Registration";
 import { AdminLoginPage } from "./pages/admin/login";
 import { AdminDashboard } from "./pages/admin/dashboard";
-import { ApplicationsManagement } from "./pages/admin/applications";
+import { ApplicationsPage } from "./pages/admin/applications";
 import { ApplicationDetails } from "./pages/admin/application-details";
-import { PaymentsManagement } from "./pages/admin/payments";
-import { RegisteredStudents } from "./pages/admin/registered-students";
-import { Settings } from "./pages/admin/settings";
-import { Reports } from "./pages/admin/reports";
-import { Support } from "./pages/admin/support";
+import { PaymentsPage } from "./pages/admin/payments";
+import { StudentsPage } from "./pages/admin/students";
+import { SettingsPage } from "./pages/admin/settings";
+import { ReportsPage } from "./pages/admin/reports";
+import { SupportPage } from "./pages/admin/support";
 import StudentDashboard from "./pages/StudentDashboard";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
@@ -72,7 +72,7 @@ const App = () => (
                     path="/admin/applications"
                     element={
                       <ProtectedRoute>
-                        <ApplicationsManagement />
+                        <ApplicationsPage />
                       </ProtectedRoute>
                     }
                   />
@@ -88,7 +88,7 @@ const App = () => (
                     path="/admin/payments"
                     element={
                       <ProtectedRoute>
-                        <PaymentsManagement />
+                        <PaymentsPage />
                       </ProtectedRoute>
                     }
                   />
@@ -96,7 +96,7 @@ const App = () => (
                     path="/admin/students"
                     element={
                       <ProtectedRoute>
-                        <RegisteredStudents />
+                        <StudentsPage />
                       </ProtectedRoute>
                     }
                   />
@@ -104,7 +104,7 @@ const App = () => (
                     path="/admin/settings"
                     element={
                       <ProtectedRoute>
-                        <Settings />
+                        <SettingsPage />
                       </ProtectedRoute>
                     }
                   />
@@ -112,7 +112,7 @@ const App = () => (
                     path="/admin/reports"
                     element={
                       <ProtectedRoute>
-                        <Reports />
+                        <ReportsPage />
                       </ProtectedRoute>
                     }
                   />
@@ -120,7 +120,7 @@ const App = () => (
                     path="/admin/support"
                     element={
                       <ProtectedRoute>
-                        <Support />
+                        <SupportPage />
                       </ProtectedRoute>
                     }
                   />

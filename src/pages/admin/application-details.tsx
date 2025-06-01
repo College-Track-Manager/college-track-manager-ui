@@ -256,7 +256,6 @@ export const ApplicationDetails = () => {
             />
           </CardContent>
         </Card>
-        </div>
       </div>
     </PageTransition>
   );

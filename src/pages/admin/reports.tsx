@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { FileText, TrendingUp, Users, Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
@@ -11,10 +13,75 @@ import {
 import { Label } from '@/components/ui/label';
 import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import { addDays } from 'date-fns';
-import { TrackDistributionChart, ApplicationsChart, PaymentStatusChart } from '@/components/reports/charts';
-import { ExportData } from '@/components/reports/export-data';
+import { DateRange } from 'react-day-picker';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  PointElement,
+} from 'chart.js';
+import { Bar, Line } from 'react-chartjs-2';
 
-// Mock data for reports
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+const reports = [
+  {
+    id: '1',
+    title: 'تقرير الطلبات الشهري',
+    description: 'تحليل تفصيلي لجميع الطلبات المقدمة خلال الشهر',
+    icon: FileText,
+  },
+  {
+    id: '2',
+    title: 'تقرير المدفوعات',
+    description: 'ملخص المدفوعات والإيرادات',
+    icon: TrendingUp,
+  },
+  {
+    id: '3',
+    title: 'تقرير الطلاب النشطين',
+    description: 'إحصائيات وتحليلات عن الطلاب النشطين',
+    icon: Users,
+  },
+];
+
+const applicationStats = {
+  labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+  datasets: [
+    {
+      label: 'الطلبات المقدمة',
+      data: [65, 59, 80, 81, 56, 55],
+      backgroundColor: 'rgba(53, 162, 235, 0.5)',
+    },
+  ],
+};
+
+const paymentStats = {
+  labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+  datasets: [
+    {
+      label: 'المدفوعات',
+      data: [12000, 19000, 15000, 25000, 22000, 30000],
+      borderColor: 'rgb(75, 192, 192)',
+      tension: 0.1,
+    },
+  ],
+};
+
 const acceptanceRateData = [
   { track: 'علوم الحاسب', total: 200, accepted: 150, rate: '75%' },
   { track: 'هندسة البرمجيات', total: 180, accepted: 120, rate: '67%' },
@@ -24,24 +91,62 @@ const acceptanceRateData = [
 ];
 
 const paymentStatsData = [
-  { track: 'علوم الحاسب', completed: 140, pending: 8, cancelled: 2, total: 150 },
-  { track: 'هندسة البرمجيات', completed: 110, pending: 7, cancelled: 3, total: 120 },
-  { track: 'نظم المعلومات', completed: 85, pending: 3, cancelled: 2, total: 90 },
-  { track: 'أمن المعلومات', completed: 75, pending: 4, cancelled: 1, total: 80 },
-  { track: 'الذكاء الاصطناعي', completed: 55, pending: 3, cancelled: 2, total: 60 },
+  { track: 'علوم الحاسب', completed: 100, pending: 20, cancelled: 10, total: 130 },
+  { track: 'هندسة البرمجيات', completed: 80, pending: 15, cancelled: 5, total: 100 },
+  { track: 'نظم المعلومات', completed: 60, pending: 10, cancelled: 5, total: 75 },
+  { track: 'أمن المعلومات', completed: 40, pending: 5, cancelled: 5, total: 50 },
+  { track: 'الذكاء الاصطناعي', completed: 20, pending: 5, cancelled: 5, total: 30 },
 ];
 
-export const Reports = () => {
-  const [date, setDate] = useState({
-    from: new Date(),
-    to: addDays(new Date(), 30),
+export const ReportsPage = () => {
+  const [selectedTrack, setSelectedTrack] = useState('all');
+  const [date, setDate] = useState<DateRange>({ 
+    from: new Date(), 
+    to: addDays(new Date(), 7)
   });
-
-  const [selectedTrack, setSelectedTrack] = useState<string>('all');
-
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">التقارير والإحصائيات</h1>
+    <div className="p-8">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-3xl font-bold">التقارير</h1>
+          <p className="text-gray-500 mt-1">إحصائيات وتقارير المدفوعات والطلبات</p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline">
+            <Download className="w-4 h-4 ml-2" />
+            تصدير التقارير
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-6">
+        {reports.map((report) => {
+          const Icon = report.icon;
+          return (
+            <Card key={report.id}>
+              <CardHeader>
+                <div className="flex items-center space-x-4 space-x-reverse">
+                  <div className="p-2 bg-primary/10 rounded-full">
+                    <Icon className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">{report.title}</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      {report.description}
+                    </p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Button variant="outline" className="w-full">
+                  <Download className="w-4 h-4 ml-2" />
+                  تحميل التقرير
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
 
       {/* Filters */}
       <Card className="mb-6">
@@ -69,7 +174,10 @@ export const Reports = () => {
 
             <div className="space-y-2">
               <Label>الفترة الزمنية</Label>
-              <DatePickerWithRange date={date} setDate={setDate} />
+              <DatePickerWithRange 
+                date={date} 
+                setDate={setDate}
+              />
             </div>
           </div>
         </CardContent>
@@ -85,23 +193,52 @@ export const Reports = () => {
 
         {/* Overview Tab */}
         <TabsContent value="overview">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <TrackDistributionChart />
-            <ApplicationsChart />
-            <PaymentStatusChart />
+          <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>إحصائيات الطلبات</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Bar
+              data={applicationStats}
+              options={{
+                responsive: true,
+                plugins: {
+                  legend: {
+                    position: 'top' as const,
+                  },
+                },
+              }}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>إحصائيات المدفوعات</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Line
+              data={paymentStats}
+              options={{
+                responsive: true,
+                plugins: {
+                  legend: {
+                    position: 'top' as const,
+                  },
+                },
+              }}
+            />
+          </CardContent>
+        </Card>
           </div>
         </TabsContent>
 
         {/* Acceptance Rates Tab */}
         <TabsContent value="acceptance">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader>
               <CardTitle>معدلات القبول حسب المسار</CardTitle>
-              <ExportData
-                data={acceptanceRateData}
-                filename="acceptance-rates"
-                title="تقرير معدلات القبول"
-              />
             </CardHeader>
             <CardContent>
               <div className="relative overflow-x-auto">
@@ -133,13 +270,8 @@ export const Reports = () => {
         {/* Payment Stats Tab */}
         <TabsContent value="payments">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader>
               <CardTitle>إحصائيات المدفوعات حسب المسار</CardTitle>
-              <ExportData
-                data={paymentStatsData}
-                filename="payment-stats"
-                title="تقرير إحصائيات المدفوعات"
-              />
             </CardHeader>
             <CardContent>
               <div className="relative overflow-x-auto">

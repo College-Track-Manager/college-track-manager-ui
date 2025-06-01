@@ -7,24 +7,44 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Track, useTracksByType } from '@/services/tracks';
 
 const Index = () => {
-  return <PageTransition>
+  return (
+    <PageTransition>
       <HeroSection />
       <AboutSection />
       <ProgramsTabsSection />
       <AllProgramsSection />
-    </PageTransition>;
+    </PageTransition>
+  );
 };
 
 const HeroSection = () => {
-  return <section className="bg-gray-50 py-12 md:py-20">
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+
+  return (
+    <section ref={ref} className="bg-gradient-to-b from-gray-50 to-white py-12 md:py-24">
       <div className="container-content flex flex-col md:flex-row-reverse items-center gap-8">
         {/* Hero Image */}
-        <div className="w-full md:w-1/2">
-          <img alt="Graduate Student" className="w-full h-auto rounded-md shadow-md" src="/images/924f47fb-e129-4626-a66e-f060fcc6a1e6.png" />
-        </div>
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
+          transition={{ duration: 0.8 }}
+          className="w-full md:w-1/2"
+        >
+          <img 
+            alt="Graduate Student" 
+            className="w-full h-auto rounded-md shadow-lg hover:shadow-xl transition-shadow duration-300" 
+            src="/images/924f47fb-e129-4626-a66e-f060fcc6a1e6.png" 
+          />
+        </motion.div>
         
         {/* Text Content */}
-        <div className="w-full md:w-1/2 text-right">
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
+          transition={{ duration: 0.8 }}
+          className="w-full md:w-1/2 text-right"
+        >
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#002b4e] mb-4">
             كلية الدراسات العليا للبحوث<br />الإحصائية
           </h1>
@@ -32,40 +52,39 @@ const HeroSection = () => {
             مرحباً بكم في كلية الدراسات العليا للبحوث الإحصائية بجامعة القاهرة. نقدم برامج
             تعليمية متميزة تلبي احتياجات سوق العمل.
           </p>
-          <Button size="lg" className="rounded-md bg-[#002b4e] hover:bg-[#00375f]">
+          <Button 
+            size="lg" 
+            className="rounded-md bg-[#002b4e] hover:bg-[#00375f] transform hover:scale-105 transition-transform duration-300"
+          >
             <Link to="/tracks">استكشف البرامج</Link>
           </Button>
-        </div>
+        </motion.div>
       </div>
-    </section>;
+    </section>
+  );
 };
 
 const AboutSection = () => {
   const ref = useRef(null);
-  const isInView = useInView(ref, {
-    once: true
-  });
-  return <section ref={ref} className="py-16 bg-white">
+  const isInView = useInView(ref, { once: true });
+
+  return (
+    <section ref={ref} className="py-16 bg-white">
       <div className="container-content">
-        <motion.div initial={{
-        opacity: 0,
-        y: 20
-      }} animate={isInView ? {
-        opacity: 1,
-        y: 0
-      } : {
-        opacity: 0,
-        y: 20
-      }} transition={{
-        duration: 0.5
-      }} className="max-w-4xl mx-auto text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-4xl mx-auto text-center"
+        >
           <h2 className="text-3xl font-bold text-[#002b4e] mb-6">عن الكلية</h2>
           <p className="text-gray-600 leading-relaxed text-base md:text-lg">
             تعد كلية الدراسات العليا للبحوث الإحصائية بجامعة القاهرة إحدى أبرز المؤسسات الاكاديمية في مجال الإحصاء في مصر والمنطقة العربية منذ تأسيسها عام 1962 تحت اسم "معهد الدراسات والبحوث الإحصائية" وحتى تغيير اسمها إلى "كلية الدراسات العليا للبحوث الإحصائية" عام 2019. تسعى الكلية إلى إعداد كوادر مؤهلة على المستوى الوطني في مجالات متعددة تشمل الإحصاء، علوم الحاسب، نظم وتكنولوجيا المعلومات، وبحوث إدارة العمليات.
           </p>
         </motion.div>
       </div>
-    </section>;
+    </section>
+  );
 };
 
 const ProgramsTabsSection = () => {
@@ -150,13 +169,15 @@ const ProgramsContent = ({ tracks, isLoading, isInView }) => {
 };
 
 const AllProgramsSection = () => {
-  return <section className="pb-16 pt-4 bg-gray-50">
+  return (
+    <section className="pb-16 pt-4 bg-gray-50">
       <div className="container-content text-center">
         <Button variant="outline" size="lg" className="border-[#002b4e] text-[#002b4e] hover:bg-[#002b4e] hover:text-white">
           <Link to="/tracks">جميع البرامج</Link>
         </Button>
       </div>
-    </section>;
+    </section>
+  );
 };
 
 export default Index;

@@ -74,7 +74,7 @@ const priorityColors = {
   low: 'bg-green-500',
 };
 
-export function Support() {
+export const SupportPage = () => {
   const [selectedTicket, setSelectedTicket] = React.useState<string | null>(null);
   const [newMessage, setNewMessage] = React.useState('');
 

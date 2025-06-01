@@ -18,14 +18,14 @@ interface SystemSettings {
   applicationDeadline: string;
 }
 
-export const Settings = () => {
+export const SettingsPage = () => {
   const [settings, setSettings] = useState<SystemSettings>({
     siteName: 'نظام إدارة المسارات الجامعية',
-    siteDescription: 'منصة متكاملة لإدارة المسارات الجامعية وطلبات الالتحاق',
+    siteDescription: 'منصة لإدارة طلبات القبول في المسارات الجامعية',
     supportEmail: 'support@example.com',
-    supportPhone: '0501234567',
+    supportPhone: '+966500000000',
     maxApplicationsPerTrack: 100,
-    applicationDeadline: '2025-08-31',
+    applicationDeadline: '2025-12-31',
   });
 
   const handleSettingChange = (key: keyof SystemSettings, value: string | number) => {
