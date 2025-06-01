@@ -17,7 +17,9 @@ import { programRegistrationApi } from '@/services/program-registration';
 
 // Define schema for program registration (step 2 & 3 fields)
 const programSchema = z.object({
-  trackType: z.union([z.literal(1), z.literal(2)]).default(1),
+  trackType: z.union([z.literal(1), z.literal(2)]).nullable().refine(val => val !== null, {
+    message: 'الرجاء اختيار نوع المسار',
+  }),
   track: z.string().min(1, { message: 'الرجاء اختيار مسار' }),
   educationLevel: z.string().min(1, { message: 'الرجاء اختيار المرحلة الدراسية' }),
   studyType: z.enum(['online', 'offline'], { required_error: 'الرجاء اختيار نوع الدراسة' }),
@@ -45,7 +47,6 @@ const ProgramRegistration = () => {
   const form = useForm<ProgramFormValues>({
     resolver: zodResolver(programSchema),
     defaultValues: {
-      trackType: preselectedType as 1 | 2,
       track: preselectedTrackId,
       educationLevel: '',
       studyType: undefined as any,
@@ -112,11 +113,7 @@ const ProgramRegistration = () => {
         }
       }
       await programRegistrationApi.submit({
-        firstName: 'Test',
-        lastName: 'User',
         email: 'test@example.com',
-        phone: '0123456789',
-        address: 'Test Address',
         studyType: data.studyType,
         trackType: data.trackType,
         trackDegree: data.educationLevel,
@@ -126,6 +123,7 @@ const ProgramRegistration = () => {
         resume: documents.resume,
         transcript: documents.transcript,
         idCard: documents.idCard,
+        AcademicYear: '2025'
       });
       toast({
         title: "تم تقديم الطلب",
@@ -169,8 +167,7 @@ const ProgramRegistration = () => {
                     <FormItem>
                       <FormLabel className="mr-3">نوع المسار</FormLabel>
                       <Select
-                        onValueChange={val => field.onChange(Number(val))}
-                        value={field.value == null ? "" : String(field.value)}
+                        onValueChange={val => field.onChange(Number(val))} value={field.value == null ? "" : String(field.value)}
                         name="trackType"
                       >
                         <SelectTrigger className="text-right w-full" dir="rtl">
@@ -194,7 +191,7 @@ const ProgramRegistration = () => {
                       <FormLabel className="mr-3">المسار</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value} name="track" disabled={tracksLoading || tracks.length === 0}>
                         <SelectTrigger className="text-right w-full" dir="rtl">
-                          <SelectValue placeholder={tracksLoading ? "جاري تحميل المسارات..." : "اختر المسار"} />
+                          <SelectValue placeholder={"اختر المسار"} />
                         </SelectTrigger>
                         <SelectContent>
                           {tracks.map((track) => (
