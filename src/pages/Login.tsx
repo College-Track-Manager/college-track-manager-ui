@@ -31,6 +31,8 @@ import { useLocation } from 'react-router-dom';
 
 import { useAuth } from '@/context/AuthContext';
 
+import { forgotPassword } from '@/services/auth';
+
 const Login = () => {
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [changePwForm, setChangePwForm] = useState({
@@ -39,6 +41,7 @@ const Login = () => {
     newPassword: '',
     confirmPassword: '',
   });
+  const [isChangingPw, setIsChangingPw] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
@@ -106,12 +109,101 @@ const Login = () => {
     }
   };
 
+  // Change Password Modal rendered outside the main Form to avoid nested <form>
+  const changePasswordModal = showChangePassword && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md relative" dir="rtl">
+        <button
+          className="absolute left-4 top-4 text-gray-500 hover:text-gray-700 text-2xl"
+          onClick={() => setShowChangePassword(false)}
+          aria-label="إغلاق"
+        >
+          ×
+        </button>
+        <h2 className="text-xl font-bold mb-4 text-center">تغيير كلمة المرور</h2>
+        <form
+          className="space-y-4"
+          onSubmit={async e => {
+            e.preventDefault();
+            setIsChangingPw(true);
+            type ForgotPasswordResponse = {
+              ok: boolean;
+              status: number;
+              message?: string;
+              [key: string]: any;
+            };
+            try {
+              const response = await forgotPassword(changePwForm.email) as ForgotPasswordResponse;
+              if (response.ok) {
+                toast.success(
+                  typeof response.message === 'string' && response.message.length > 0
+                    ? response.message
+                    : 'تم إرسال رابط تغيير كلمة المرور إلى بريدك الإلكتروني'
+                );
+                setShowChangePassword(false);
+              } else {
+                toast.error('تعذر إرسال طلب تغيير كلمة المرور', {
+                  description:
+                    typeof response.message === 'string' && response.message.length > 0
+                      ? response.message
+                      : 'يرجى التحقق من البريد الإلكتروني والمحاولة مرة أخرى',
+                });
+              }
+            } catch (error) {
+              toast.error('حدث خطأ أثناء إرسال طلب تغيير كلمة المرور');
+            } finally {
+              setIsChangingPw(false);
+            }
+          }}
+        >
+          <Input
+            type="email"
+            required
+            placeholder="البريد الإلكتروني"
+            className="w-full"
+            value={changePwForm.email}
+            onChange={e => setChangePwForm(f => ({ ...f, email: e.target.value }))}
+          />
+          <Input
+            type="password"
+            required
+            placeholder="كلمة المرور الحالية"
+            className="w-full"
+            value={changePwForm.oldPassword}
+            onChange={e => setChangePwForm(f => ({ ...f, oldPassword: e.target.value }))}
+          />
+          <Input
+            type="password"
+            required
+            placeholder="كلمة المرور الجديدة"
+            className="w-full"
+            value={changePwForm.newPassword}
+            onChange={e => setChangePwForm(f => ({ ...f, newPassword: e.target.value }))}
+          />
+          <Input
+            type="password"
+            required
+            placeholder="تأكيد كلمة المرور الجديدة"
+            className="w-full"
+            value={changePwForm.confirmPassword}
+            onChange={e => setChangePwForm(f => ({ ...f, confirmPassword: e.target.value }))}
+          />
+          <Button type="submit" className="w-full bg-primary text-white mt-2" disabled={isChangingPw}>
+            {isChangingPw ? 'جاري الإرسال...' : 'تغيير كلمة المرور'}
+          </Button>
+        </form>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="items-center px-4 py-8 text-center mt-5">
-      <main className="flex-1 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8">
-        <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">تسجيل الدخول</CardTitle>
+    <>
+      {changePasswordModal}
+      <div className="items-center px-4 py-8 text-center mt-5">
+        <main className="flex-1 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8">
+          <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center">تسجيل الدخول</CardTitle>
           <CardDescription className="text-center">
             قم بتسجيل الدخول للوصول إلى البرامج 
           </CardDescription>
@@ -172,9 +264,9 @@ const Login = () => {
                   type="button"
                   className="text-blue-700 hover:underline font-medium"
                   style={{ direction: 'rtl' }}
-                  onClick={() => setShowChangePassword(true)}
+                  onClick={() => navigate('/forgot-password')}
                 >
-                  تغيير كلمة المرور
+                  نسيت كلمة المرور؟
                 </button>
               </p>
               <p className="text-center text-sm text-muted-foreground">
@@ -187,71 +279,13 @@ const Login = () => {
                   إنشاء حساب جديد
                 </button>
               </p>
-
-              {/* Change Password Modal */}
-              {showChangePassword && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                  <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md relative" dir="rtl">
-                    <button
-                      className="absolute left-4 top-4 text-gray-500 hover:text-gray-700 text-2xl"
-                      onClick={() => setShowChangePassword(false)}
-                      aria-label="إغلاق"
-                    >
-                      ×
-                    </button>
-                    <h2 className="text-xl font-bold mb-4 text-center">تغيير كلمة المرور</h2>
-                    <form
-                      className="space-y-4"
-                      onSubmit={e => {
-                        e.preventDefault();
-                        console.log('Change Password:', changePwForm);
-                        setShowChangePassword(false);
-                        toast.success('تم إرسال طلب تغيير كلمة المرور');
-                      }}
-                    >
-                      <Input
-                        type="email"
-                        required
-                        placeholder="البريد الإلكتروني"
-                        className="w-full"
-                        value={changePwForm.email}
-                        onChange={e => setChangePwForm(f => ({ ...f, email: e.target.value }))}
-                      />
-                      <Input
-                        type="password"
-                        required
-                        placeholder="كلمة المرور الحالية"
-                        className="w-full"
-                        value={changePwForm.oldPassword}
-                        onChange={e => setChangePwForm(f => ({ ...f, oldPassword: e.target.value }))}
-                      />
-                      <Input
-                        type="password"
-                        required
-                        placeholder="كلمة المرور الجديدة"
-                        className="w-full"
-                        value={changePwForm.newPassword}
-                        onChange={e => setChangePwForm(f => ({ ...f, newPassword: e.target.value }))}
-                      />
-                      <Input
-                        type="password"
-                        required
-                        placeholder="تأكيد كلمة المرور الجديدة"
-                        className="w-full"
-                        value={changePwForm.confirmPassword}
-                        onChange={e => setChangePwForm(f => ({ ...f, confirmPassword: e.target.value }))}
-                      />
-                      <Button type="submit" className="w-full bg-primary text-white mt-2">تغيير كلمة المرور</Button>
-                    </form>
-                  </div>
-                </div>
-              )}
             </form>
           </Form>
         </CardContent>
         </Card>
       </main>
     </div>
+    </>
   );
 };
 
