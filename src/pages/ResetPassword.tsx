@@ -6,21 +6,7 @@ import { Button } from "@/components/ui/button";
 
 import { toast } from "sonner";
 
-// Real API integration for reset password
-async function resetPasswordApi({ email, token, newPassword }: { email: string; token: string; newPassword: string }) {
-  const res = await fetch("http://localhost:5050/api/login/reset-password", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, token, newPassword }),
-  });
-  let data;
-  try {
-    data = await res.json();
-  } catch {
-    data = {};
-  }
-  return { ok: res.ok, status: res.status, ...data };
-}
+import { resetPasswordApi } from "@/services/login";
 
 export default function ResetPassword() {
   const navigate = useNavigate();

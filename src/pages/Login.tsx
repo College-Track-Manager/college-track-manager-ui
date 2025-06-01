@@ -31,7 +31,7 @@ import { useLocation } from 'react-router-dom';
 
 import { useAuth } from '@/context/AuthContext';
 
-import { forgotPassword } from '@/services/auth';
+import { forgotPassword } from '@/services/login';
 
 const Login = () => {
   const [showChangePassword, setShowChangePassword] = useState(false);
@@ -59,7 +59,7 @@ const Login = () => {
     setIsSubmitting(true);
     try {
       // Use backend API for login
-      const { loginUser } = await import("@/services/auth");
+      const { loginUser } = await import("@/services/login");
       const response = await loginUser({ Username: data.email, Password: data.password });
       console.log('Login response:', response);
       if (response.token) {
