@@ -19,12 +19,14 @@ import {
 import { CheckCircle, AlertCircle, XCircle } from 'lucide-react';
 
 interface ActionButtonsProps {
+  loading?: boolean;
   onApprove: (paymentCode: string) => void;
   onRequestModification: (notes: string) => void;
   onReject: (reason: string) => void;
 }
 
 export const ActionButtons: React.FC<ActionButtonsProps> = ({
+  loading = false,
   onApprove,
   onRequestModification,
   onReject,
@@ -64,6 +66,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         <Button
           onClick={() => setShowApproveDialog(true)}
           className="bg-green-600 hover:bg-green-700"
+          disabled={loading}
         >
           <CheckCircle className="ml-2 h-4 w-4" />
           قبول الطلب
@@ -71,6 +74,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         <Button
           variant="outline"
           onClick={() => setShowModificationDialog(true)}
+          disabled={loading}
         >
           <AlertCircle className="ml-2 h-4 w-4" />
           طلب تعديل
@@ -78,6 +82,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         <Button
           variant="destructive"
           onClick={() => setShowRejectDialog(true)}
+          disabled={loading}
         >
           <XCircle className="ml-2 h-4 w-4" />
           رفض الطلب
@@ -97,7 +102,11 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
             <Button variant="outline" onClick={() => setShowApproveDialog(false)}>
               إلغاء
             </Button>
-            <Button onClick={handleApprove} className="bg-green-600 hover:bg-green-700">
+            <Button
+              onClick={handleApprove}
+              className="bg-green-600 hover:bg-green-700"
+              disabled={loading}
+            >
               تأكيد القبول
             </Button>
           </DialogFooter>
