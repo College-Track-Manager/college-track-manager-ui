@@ -30,8 +30,6 @@ export const isLoggedIn = () => !!getToken();
  */
 export const forgotPassword = async (email: string) => {
   const token = getToken();
-  console.log('forget passwd');
-
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { getToken, removeToken } from '@/services/auth';
+import { getToken, removeToken } from '@/services/login';
 import { useNavigate } from 'react-router-dom';
 
 interface User {

@@ -22,6 +22,9 @@ import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import ProgramRegistration from "./pages/ProgramRegistration";
 import ProgramRegistrationSuccess from "./pages/ProgramRegistrationSuccess";
+import ForgotPassword from "./pages/ForgotPassword";
+import StatusMessage from "./pages/StatusMessage";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,12 +52,15 @@ const App = () => (
                   <Route path="/tracks" element={<Tracks />} />
                   <Route path="/tracks/:trackId" element={<TrackDetail />} />
                   <Route path="/login" element={<Login />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/registration" element={<Registration />} />
                   <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
                   <Route path="/student/dashboard" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
                   <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                   <Route path="/program-registration" element={<ProtectedRoute><ProgramRegistration /></ProtectedRoute>} />
                   <Route path="/program-registration-success" element={<ProgramRegistrationSuccess />} />
+                  <Route path="/status" element={<StatusMessage />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </AnimatePresence>
