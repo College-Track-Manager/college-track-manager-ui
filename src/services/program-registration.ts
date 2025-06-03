@@ -1,12 +1,9 @@
 import axios from 'axios';
 import { API_BASE_URL } from './config';
+import { getToken } from './login';
 
 export interface ProgramRegistrationData {
-  firstName: string;
-  lastName: string;
   email: string;
-  phone: string;
-  address: string;
   trackType: string | number;
   trackDegree: string;
   studyType: string;
@@ -16,30 +13,39 @@ export interface ProgramRegistrationData {
   resume: File;
   transcript: File;
   idCard: File;
+  AcademicYear: string;
 }
 
 export const programRegistrationApi = {
   submit: async (data: ProgramRegistrationData) => {
+    
+    const token = getToken();
+    if (!token) {
+      console.error("❌ No token found. User may not be logged in.");
+      throw new Error("Authentication token not found.");
+    }
+    
     const formData = new FormData();
-    formData.append('firstName', 'Test');
-    formData.append('lastName', 'User');
-    formData.append('email', 'test@example.com');
-    formData.append('phone', '0123456789');
-    formData.append('address', 'Test Address');
+    formData.append('email', data.email);
     formData.append('trackType', String(data.trackType));
     formData.append('trackDegree', data.trackDegree);
     formData.append('studyType', data.studyType);
-    formData.append('track', data.track);
+    formData.append('trackId', data.track);
     formData.append('education', data.education);
     formData.append('statement', data.statement);
     formData.append('resume', data.resume);
     formData.append('transcript', data.transcript);
     formData.append('idCard', data.idCard);
+    formData.append('AcademicYear', data.AcademicYear);
+    
+    console.log('Submitting with token:', token);
+    console.log('TrackId:', data.track);
 
     const url = `${API_BASE_URL}/api/StudentRegistrations`;
     const response = await axios.post(url, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
+        'Authorization': 'Bearer ' + token,
       },
     });
     console.log('Program registration API response:', response);

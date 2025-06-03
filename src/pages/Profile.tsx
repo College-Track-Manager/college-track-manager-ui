@@ -7,14 +7,14 @@ const Profile = () => {
   return (
     <div className="container mx-auto py-8">
       <Card className="max-w-lg mx-auto">
-        <CardHeader>
-          <CardTitle>الملف الشخصى</CardTitle>
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold">الملف الشخصى</CardTitle>
           <CardDescription>إدارة بيانات حسابك الشخصية</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
             <label className="block mb-1 font-medium">الاسم</label>
-            <Input value={user?.name || ''} disabled className="bg-gray-100" />
+            <Input value={user?.fullName || ''} disabled className="bg-gray-100" />
           </div>
           <div>
             <label className="block mb-1 font-medium">البريد الإلكتروني</label>
@@ -22,7 +22,11 @@ const Profile = () => {
           </div>
           <div>
             <label className="block mb-1 font-medium">الرقم القومي</label>
-            <Input value={user?.nationalId || ''} disabled className="bg-gray-200 text-gray-400" />
+            <Input value={user?.nationalId || ''} disabled className="bg-gray-200 " />
+          </div>
+          <div>
+            <label className="block mb-1 font-medium">العنوان </label>
+            <Input value={user?.address || ''} disabled className="bg-gray-200" />
           </div>
         </CardContent>
       </Card>
