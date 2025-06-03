@@ -113,12 +113,11 @@ const Registration = () => {
 
   return (
     <PageTransition>
-      <div className="max-w-2xl mx-auto mt-10 p-8 bg-white rounded-xl shadow-lg">
+      <div className="max-w-2xl mx-auto mt-20 mb-12 p-8 bg-white rounded-xl shadow-lg">
         <h1 className="text-3xl font-bold mb-8 text-center text-blue-700">تسجيل حساب جديد</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <RegistrationFields control={form.control} />
-            {/* Debug: Show when submitting */}
             {isSubmitting && <div style={{ color: 'blue', marginBottom: 8 }}>Submitting...</div>}
             <Button type="submit" className="w-full mt-8" disabled={isSubmitting}>
               {isSubmitting ? 'جاري إنشاء الحساب...' : 'إنشاء الحساب'}
@@ -126,7 +125,9 @@ const Registration = () => {
           </form>
         </Form>
       </div>
+
     </PageTransition>
+
   );
 };
 
