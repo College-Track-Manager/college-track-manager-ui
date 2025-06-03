@@ -111,7 +111,7 @@ const Login = () => {
 
   // Change Password Modal rendered outside the main Form to avoid nested <form>
   const changePasswordModal = showChangePassword && (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
       <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md relative" dir="rtl">
         <button
           className="absolute left-4 top-4 text-gray-500 hover:text-gray-700 text-2xl"
@@ -199,92 +199,89 @@ const Login = () => {
   return (
     <>
       {changePasswordModal}
-      <div className="items-center px-4 py-8 text-center mt-5">
-        <main className="flex-1 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8">
+      <div className="flex flex-col flex-1 min-h-0">
+        <div className="flex flex-1 min-h-0 items-center justify-center">
           <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center">تسجيل الدخول</CardTitle>
-          <CardDescription className="text-center">
-            قم بتسجيل الدخول للوصول إلى البرامج 
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>البريد الإلكتروني</FormLabel>
-                    <FormControl>
-                      <Input 
-                        {...field} 
-                        type="email" 
-                        placeholder="example@example.com"
-                        autoComplete="email"
-                        className="h-12 text-base"
-                      />
-                    </FormControl>
-                    <FormMessage className="text-sm" />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>كلمة المرور</FormLabel>
-                    <FormControl>
-                      <Input 
-                        {...field} 
-                        type="password" 
-                        placeholder="أدخل كلمة المرور"
-                        autoComplete="current-password"
-                        className="h-12 text-base"
-                      />
-                    </FormControl>
-                    <FormMessage className="text-sm" />
-                  </FormItem>
-                )}
-              />
-
-              <Button 
-                type="submit" 
-                className="w-full bg-primary hover:bg-primary/90 text-white h-12 text-base" 
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
-              </Button>
-
-              <p className="text-center text-sm text-muted-foreground">
-                <button
-                  type="button"
-                  className="text-blue-700 hover:underline font-medium"
-                  style={{ direction: 'rtl' }}
-                  onClick={() => navigate('/forgot-password')}
-                >
-                  نسيت كلمة المرور؟
-                </button>
-              </p>
-              <p className="text-center text-sm text-muted-foreground">
-                ليس لديك حساب؟{' '}
-                <button
-                  type="button"
-                  onClick={() => navigate('/registration')}
-                  className="text-primary hover:text-primary/90 transition-colors font-medium"
-                >
-                  إنشاء حساب جديد
-                </button>
-              </p>
-            </form>
-          </Form>
-        </CardContent>
-        </Card>
-      </main>
-    </div>
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold text-center">تسجيل الدخول</CardTitle>
+              <CardDescription className="text-center">
+                قم بتسجيل الدخول للوصول إلى البرامج
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>البريد الإلكتروني</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            type="email" 
+                            placeholder="example@example.com"
+                            autoComplete="email"
+                            className="h-12 text-base"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-sm" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>كلمة المرور</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            type="password" 
+                            placeholder="أدخل كلمة المرور"
+                            autoComplete="current-password"
+                            className="h-12 text-base"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-sm" />
+                      </FormItem>
+                    )}
+                  />
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-primary hover:bg-primary/90 text-white h-12 text-base" 
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
+                  </Button>
+                  <p className="text-center text-sm text-muted-foreground">
+                    <button
+                      type="button"
+                      className="text-blue-700 hover:underline font-medium"
+                      style={{ direction: 'rtl' }}
+                      onClick={() => navigate('/forgot-password')}
+                    >
+                      نسيت كلمة المرور؟
+                    </button>
+                  </p>
+                  <p className="text-center text-sm text-muted-foreground">
+                    ليس لديك حساب؟{' '}
+                    <button
+                      type="button"
+                      onClick={() => navigate('/registration')}
+                      className="text-primary hover:text-primary/90 transition-colors font-medium"
+                    >
+                      إنشاء حساب جديد
+                    </button>
+                  </p>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </>
   );
 };

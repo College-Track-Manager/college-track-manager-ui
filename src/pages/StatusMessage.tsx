@@ -20,8 +20,8 @@ export default function StatusMessage() {
     (location.state as any) || {};
 
   return (
-<div className="flex flex-col items-center bg-neutral-100 px-4 py-8 text-center mt-20">
-        <Card className="w-full max-w-md">
+<div className="max-w-2xl mx-auto mt-[160px] mb-[60px]">
+<Card className="w-full max-w-md">
         <CardHeader>
           <div className="flex flex-col items-center">
             {icons[type as StatusType] || icons.info}

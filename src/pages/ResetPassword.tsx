@@ -107,39 +107,41 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">إعادة تعيين كلمة المرور</CardTitle>
-          <CardDescription className="text-center">
-            أدخل كلمة المرور الجديدة لحساب البريد الإلكتروني:
-            <span className="block font-bold mt-1">{email}</span>
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <Input
-              type="password"
-              required
-              placeholder="كلمة المرور الجديدة"
-              className="w-full"
-              value={newPassword}
-              onChange={e => setNewPassword(e.target.value)}
-            />
-            <Input
-              type="password"
-              required
-              placeholder="تأكيد كلمة المرور الجديدة"
-              className="w-full"
-              value={confirmPassword}
-              onChange={e => setConfirmPassword(e.target.value)}
-            />
-            <Button type="submit" className="w-full bg-primary text-white mt-2" disabled={isSubmitting}>
-              {isSubmitting ? "جاري التغيير..." : "تغيير كلمة المرور"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+    <div className="flex flex-col flex-1 min-h-0">
+      <div className="flex flex-1 min-h-0 items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center">إعادة تعيين كلمة المرور</CardTitle>
+            <CardDescription className="text-center">
+              أدخل كلمة المرور الجديدة لحساب البريد الإلكتروني:
+              <span className="block font-bold mt-1">{email}</span>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <Input
+                type="password"
+                required
+                placeholder="كلمة المرور الجديدة"
+                className="w-full"
+                value={newPassword}
+                onChange={e => setNewPassword(e.target.value)}
+              />
+              <Input
+                type="password"
+                required
+                placeholder="تأكيد كلمة المرور الجديدة"
+                className="w-full"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+              />
+              <Button type="submit" className="w-full bg-primary text-white mt-2" disabled={isSubmitting}>
+                {isSubmitting ? "جاري التغيير..." : "تغيير كلمة المرور"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

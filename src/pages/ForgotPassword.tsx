@@ -65,42 +65,44 @@ const ForgotPassword = () => {
   };
 
   return (
-<div className="flex flex-col items-center bg-neutral-100 px-4 py-8 text-center mt-20">
-<Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">نسيت كلمة المرور؟</CardTitle>
-          <CardDescription className="text-center">
-            أدخل بريدك الإلكتروني لإرسال رابط إعادة تعيين كلمة المرور
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <Input
-              type="email"
-              required
-              placeholder="البريد الإلكتروني"
-              className="w-full"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-            />
-            <Button
-              type="submit"
-              className="w-full bg-primary text-white mt-2"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? 'جاري الإرسال...' : 'إرسال رابط إعادة تعيين كلمة المرور'}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full mt-2"
-              onClick={() => navigate('/login')}
-            >
-              العودة إلى تسجيل الدخول
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+    <div className="flex flex-col flex-1 min-h-0">
+      <div className="flex flex-1 min-h-0 items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center">نسيت كلمة المرور؟</CardTitle>
+            <CardDescription className="text-center">
+              أدخل بريدك الإلكتروني لإرسال رابط إعادة تعيين كلمة المرور
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <Input
+                type="email"
+                required
+                placeholder="البريد الإلكتروني"
+                className="w-full"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+              />
+              <Button
+                type="submit"
+                className="w-full bg-primary text-white mt-2"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'جاري الإرسال...' : 'إرسال رابط إعادة تعيين كلمة المرور'}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full mt-2"
+                onClick={() => navigate('/login')}
+              >
+                العودة إلى تسجيل الدخول
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
