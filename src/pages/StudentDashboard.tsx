@@ -1,101 +1,94 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PageTransition from "@/components/ui/PageTransition";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, BookIcon, GraduationCapIcon, FileTextIcon, ClockIcon } from "lucide-react";
-
+import { BookIcon, GraduationCapIcon } from "lucide-react";
 import { useAuth } from '@/context/AuthContext';
+import { useEffect, useState } from 'react';
+import { fetchStudentProfile, StudentProfile } from '@/services/students';
 
 const StudentDashboard = () => {
   const { user } = useAuth();
-  // Use logged-in user info from AuthContext
-  const student = {
-    name: user?.name || user?.fullName || "طالب",
-    email: user?.email || "",
-    track: user?.track || "-",
-    enrollmentDate: user?.enrollmentDate || "-",
-    progress: user?.progress || 0,
-    avatar: user?.avatar || "/placeholder.svg",
+  const [profile, setProfile] = useState<StudentProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    fetchStudentProfile()
+      .then(data => {
+        setProfile(data);
+        setError(null);
+      })
+      .catch(() => {
+        setError('فشل تحميل بيانات الطالب.');
+        setProfile(null);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const getTrackTypeString = (type: number) => {
+    switch (type) {
+      case 1: return 'أكاديمي';
+      case 2: return 'مهني';
+      default: return 'غير محدد';
+    }
   };
 
-  // Mock courses data
-  const courses = [
-    {
-      id: 1,
-      title: "مقدمة في البرمجة",
-      instructor: "د. سارة وليامز",
-      schedule: "الاثنين، الأربعاء ١٠:٠٠ - ١١:٣٠ صباحًا",
-      completion: 80,
-      nextClass: "غدًا، ١٠:٠٠ صباحًا",
-      materials: 12,
-    },
-    {
-      id: 2,
-      title: "هياكل البيانات والخوارزميات",
-      instructor: "أ. مايكل تشين",
-      schedule: "الثلاثاء، الخميس ١:٠٠ - ٢:٣٠ مساءً",
-      completion: 45,
-      nextClass: "الخميس، ١:٠٠ مساءً",
-      materials: 8,
-    },
-    {
-      id: 3,
-      title: "أنظمة قواعد البيانات",
-      instructor: "د. إيميلي رودريجيز",
-      schedule: "الجمعة ٩:٠٠ - ١٢:٠٠ مساءً",
-      completion: 20,
-      nextClass: "الجمعة، ٩:٠٠ صباحًا",
-      materials: 5,
-    },
-  ];
+  const getTrackDegreeString = (degree: number) => {
+    switch (degree) {
+      case 1: return 'دبلوم';
+      case 2: return 'ماجستير';
+      case 3: return 'دكتوراه';
+    }
+  };
 
-  // Mock announcements data
-  const announcements = [
-    {
-      id: 1,
-      title: "تم إصدار جدول الاختبارات النصفية",
-      date: "٥ أكتوبر ٢٠٢٣",
-      content: "تم إصدار جدول الاختبارات النصفية. يرجى التحقق من صفحات الدورات الخاصة بك للتواريخ والموضوعات المحددة.",
-    },
-    {
-      id: 2,
-      title: "محاضرة خاصة: اتجاهات الصناعة",
-      date: "١٢ أكتوبر ٢٠٢٣",
-      content: "ستعقد محاضرة خاصة حول اتجاهات الصناعة الحالية الأسبوع المقبل. ينصح بحضور جميع الطلاب.",
-    },
-  ];
+  const getStudyTypeString = (type: number) => {
+    switch (type) {
+      case 1: return 'اونلاين';
+      case 2: return 'حضورى';
+    }
+  };
 
-  // Mock upcoming deadlines
-  const deadlines = [
-    { id: 1, course: "مقدمة في البرمجة", task: "تسليم المشروع", dueDate: "١٠ أكتوبر ٢٠٢٣" },
-    { id: 2, course: "هياكل البيانات والخوارزميات", task: "الواجب #٣", dueDate: "١٥ أكتوبر ٢٠٢٣" },
-    { id: 3, course: "أنظمة قواعد البيانات", task: "الاختبار القصير #٢", dueDate: "٨ أكتوبر ٢٠٢٣" },
-  ];
+  if (loading) {
+    return (
+      <PageTransition>
+        <div className="flex justify-center items-center h-96">
+          <span>جاري التحميل...</span>
+        </div>
+      </PageTransition>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageTransition>
+        <div className="flex justify-center items-center h-96">
+          <span className="text-red-500">{error}</span>
+        </div>
+      </PageTransition>
+    );
+  }
+
+  if (!profile) return null;
 
   return (
     <PageTransition>
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto py-8" dir="rtl">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card className="md:col-span-2">
             <CardHeader className="flex flex-row items-center gap-4">
               <Avatar className="h-16 w-16">
-                <AvatarImage src={student.avatar} alt={student.name} />
-                <AvatarFallback>{student.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                <AvatarImage src={user?.avatar || '/placeholder.svg'} alt={profile.fullName} />
+                <AvatarFallback>{profile.fullName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
               </Avatar>
               <div>
-                <CardTitle className="text-2xl">{student.name}</CardTitle>
-                <CardDescription>{student.email}</CardDescription>
+                <CardTitle className="text-2xl">{profile.fullName}</CardTitle>
+                <CardDescription>{profile.email}</CardDescription>
                 <div className="flex items-center gap-2 mt-1">
-                  <Badge variant="outline">{student.track}</Badge>
-                  <Badge variant="outline" className="bg-primary/10">التسجيل: {student.enrollmentDate}</Badge>
-                  {user && (
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">معرّف المستخدم: {user.sub || user.id || user.userId || ''}</Badge>
-                  )}
+                  <Badge variant="outline">{profile.track?.title}</Badge>
                 </div>
               </div>
             </CardHeader>
@@ -103,21 +96,14 @@ const StudentDashboard = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">تقدم البرنامج</CardTitle>
+              <CardTitle className="text-lg">معلومات المسار الأكاديمي</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between mb-1 text-sm">
-                    <span>الإكمال الكلي</span>
-                    <span>{student.progress}%</span>
-                  </div>
-                  <Progress value={student.progress} className="h-2" />
-                </div>
-                <div className="text-center pt-3">
-                  <p className="text-sm text-muted-foreground">استمر! أنت تحرز تقدمًا جيدًا.</p>
-                </div>
-              </div>
+            <CardContent className="text-sm space-y-2">
+              <div><strong>التخصص:</strong> {profile.education}</div>
+              <div><strong>نوع المسار:</strong> {getTrackTypeString(profile.trackType)}</div>
+              <div><strong>درجة المسار:</strong> {getTrackDegreeString(profile.trackDegree)}</div>
+              <div><strong>نوع الدراسة:</strong> {getStudyTypeString(profile.studyType)}</div>
+              <div><strong>تاريخ التسجيل:</strong> {new Date(profile.registrationDate).toLocaleDateString('ar-EG')}</div>
             </CardContent>
           </Card>
         </div>
@@ -125,98 +111,35 @@ const StudentDashboard = () => {
         <Tabs defaultValue="courses">
           <TabsList className="mb-6">
             <TabsTrigger value="courses">دوراتي</TabsTrigger>
-            <TabsTrigger value="announcements">الإعلانات</TabsTrigger>
-            <TabsTrigger value="deadlines">المواعيد النهائية القادمة</TabsTrigger>
           </TabsList>
 
           <TabsContent value="courses">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {courses.map((course) => (
-                <Card key={course.id} className="overflow-hidden">
-                  <CardHeader className="pb-2">
-                    <CardTitle>{course.title}</CardTitle>
-                    <CardDescription>{course.instructor}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm">
-                      <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                      <span>{course.schedule}</span>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1 text-sm">
-                        <span>تقدم الدورة</span>
-                        <span>{course.completion}%</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {profile.courses && profile.courses.length > 0 ? (
+                profile.courses.map((course) => (
+                  <Card key={course.courseCode}>
+                    <CardHeader className="text-right">
+                      <CardTitle>{course.title}</CardTitle>
+                      <CardDescription>{course.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="text-right">
+                      <div className="w-full flex flex-col items-end gap-2 text-right">
+                        <div className="text-sm">
+                          <span>رمز المقرر: {course.courseCode}</span>
+                          <BookIcon className="h-4 w-4 text-muted-foreground inline-block mr-2" />
+                        </div>
+                        <div className="text-sm">
+                          <span>عدد الساعات: {course.credits}</span>
+                          <GraduationCapIcon className="h-4 w-4 text-muted-foreground inline-block mr-2" />
+                        </div>
                       </div>
-                      <Progress value={course.completion} className="h-2" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 pt-2">
-                      <div className="flex flex-col">
-                        <span className="text-xs text-muted-foreground">الدرس القادم</span>
-                        <span className="text-sm flex items-center gap-1">
-                          <ClockIcon className="h-3 w-3" /> {course.nextClass}
-                        </span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-xs text-muted-foreground">المواد</span>
-                        <span className="text-sm flex items-center gap-1">
-                          <FileTextIcon className="h-3 w-3" /> {course.materials} ملفات
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="bg-muted/50 pt-2">
-                    <Button variant="outline" className="w-full">الذهاب إلى الدورة</Button>
-                  </CardFooter>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <div>لا توجد دورات مسجلة.</div>
+              )}
             </div>
-          </TabsContent>
-
-          <TabsContent value="announcements">
-            <Card>
-              <CardHeader>
-                <CardTitle>إعلانات البرنامج</CardTitle>
-                <CardDescription>إشعارات وتحديثات مهمة</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {announcements.map((announcement) => (
-                    <div key={announcement.id} className="border-b pb-4 last:border-0 last:pb-0">
-                      <div className="flex justify-between items-baseline mb-2">
-                        <h3 className="font-medium">{announcement.title}</h3>
-                        <span className="text-sm text-muted-foreground">{announcement.date}</span>
-                      </div>
-                      <p className="text-sm">{announcement.content}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="deadlines">
-            <Card>
-              <CardHeader>
-                <CardTitle>المواعيد النهائية القادمة</CardTitle>
-                <CardDescription>الواجبات والمشاريع المستحقة قريبًا</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {deadlines.map((deadline) => (
-                    <div key={deadline.id} className="flex justify-between items-center p-3 border rounded-lg">
-                      <div>
-                        <h4 className="font-medium">{deadline.task}</h4>
-                        <p className="text-sm text-muted-foreground">{deadline.course}</p>
-                      </div>
-                      <div className="text-left">
-                        <p className="text-sm font-medium">الموعد النهائي: {deadline.dueDate}</p>
-                        <Button size="sm" variant="ghost" className="mt-1 h-7 text-xs">عرض التفاصيل</Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
       </div>
