@@ -31,6 +31,8 @@ import { useLocation } from 'react-router-dom';
 
 import { useAuth } from '@/context/AuthContext';
 
+import { forgotPassword } from '@/services/login';
+
 const Login = () => {
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [changePwForm, setChangePwForm] = useState({
@@ -39,6 +41,7 @@ const Login = () => {
     newPassword: '',
     confirmPassword: '',
   });
+  const [isChangingPw, setIsChangingPw] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
@@ -56,7 +59,7 @@ const Login = () => {
     setIsSubmitting(true);
     try {
       // Use backend API for login
-      const { loginUser } = await import("@/services/auth");
+      const { loginUser } = await import("@/services/login");
       const response = await loginUser({ Username: data.email, Password: data.password });
       console.log('Login response:', response);
       if (response.token) {
@@ -106,157 +109,180 @@ const Login = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Header placeholder - replace with your actual header component if needed */}
-      {/* <Header /> */}
-      <main className="flex-1 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8">
-        <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">تسجيل الدخول</CardTitle>
-          <CardDescription className="text-center">
-            قم بتسجيل الدخول للوصول إلى البرامج 
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>البريد الإلكتروني</FormLabel>
-                    <FormControl>
-                      <Input 
-                        {...field} 
-                        type="email" 
-                        placeholder="example@example.com"
-                        autoComplete="email"
-                        className="h-12 text-base"
-                      />
-                    </FormControl>
-                    <FormMessage className="text-sm" />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>كلمة المرور</FormLabel>
-                    <FormControl>
-                      <Input 
-                        {...field} 
-                        type="password" 
-                        placeholder="أدخل كلمة المرور"
-                        autoComplete="current-password"
-                        className="h-12 text-base"
-                      />
-                    </FormControl>
-                    <FormMessage className="text-sm" />
-                  </FormItem>
-                )}
-              />
-
-              <Button 
-                type="submit" 
-                className="w-full bg-primary hover:bg-primary/90 text-white h-12 text-base" 
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
-              </Button>
-
-              <p className="text-center text-sm text-muted-foreground">
-                <button
-                  type="button"
-                  className="text-blue-700 hover:underline font-medium mb-2"
-                  style={{ direction: 'rtl' }}
-                  onClick={() => setShowChangePassword(true)}
-                >
-                  تغيير كلمة المرور
-                </button>
-              </p>
-              <p className="text-center text-sm text-muted-foreground">
-                ليس لديك حساب؟{' '}
-                <button
-                  type="button"
-                  onClick={() => navigate('/registration')}
-                  className="text-primary hover:text-primary/90 transition-colors font-medium"
-                >
-                  إنشاء حساب جديد
-                </button>
-              </p>
-
-              {/* Change Password Modal */}
-              {showChangePassword && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                  <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md relative" dir="rtl">
-                    <button
-                      className="absolute left-4 top-4 text-gray-500 hover:text-gray-700 text-2xl"
-                      onClick={() => setShowChangePassword(false)}
-                      aria-label="إغلاق"
-                    >
-                      ×
-                    </button>
-                    <h2 className="text-xl font-bold mb-4 text-center">تغيير كلمة المرور</h2>
-                    <form
-                      className="space-y-4"
-                      onSubmit={e => {
-                        e.preventDefault();
-                        // Log values for now
-                        console.log('Change Password:', changePwForm);
-                        setShowChangePassword(false);
-                        toast.success('تم إرسال طلب تغيير كلمة المرور');
-                      }}
-                    >
-                      <Input
-                        type="email"
-                        required
-                        placeholder="البريد الإلكتروني"
-                        className="w-full"
-                        value={changePwForm.email}
-                        onChange={e => setChangePwForm(f => ({ ...f, email: e.target.value }))}
-                      />
-                      <Input
-                        type="password"
-                        required
-                        placeholder="كلمة المرور الحالية"
-                        className="w-full"
-                        value={changePwForm.oldPassword}
-                        onChange={e => setChangePwForm(f => ({ ...f, oldPassword: e.target.value }))}
-                      />
-                      <Input
-                        type="password"
-                        required
-                        placeholder="كلمة المرور الجديدة"
-                        className="w-full"
-                        value={changePwForm.newPassword}
-                        onChange={e => setChangePwForm(f => ({ ...f, newPassword: e.target.value }))}
-                      />
-                      <Input
-                        type="password"
-                        required
-                        placeholder="تأكيد كلمة المرور الجديدة"
-                        className="w-full"
-                        value={changePwForm.confirmPassword}
-                        onChange={e => setChangePwForm(f => ({ ...f, confirmPassword: e.target.value }))}
-                      />
-                      <Button type="submit" className="w-full bg-primary text-white mt-2">تغيير كلمة المرور</Button>
-                    </form>
-                  </div>
-                </div>
-              )}
-            </form>
-          </Form>
-        </CardContent>
-        </Card>
-      </main>
-      {/* Footer placeholder - replace with your actual footer component if needed */}
-      {/* <Footer /> */}
+  // Change Password Modal rendered outside the main Form to avoid nested <form>
+  const changePasswordModal = showChangePassword && (
+    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+      <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md relative" dir="rtl">
+        <button
+          className="absolute left-4 top-4 text-gray-500 hover:text-gray-700 text-2xl"
+          onClick={() => setShowChangePassword(false)}
+          aria-label="إغلاق"
+        >
+          ×
+        </button>
+        <h2 className="text-xl font-bold mb-4 text-center">تغيير كلمة المرور</h2>
+        <form
+          className="space-y-4"
+          onSubmit={async e => {
+            e.preventDefault();
+            setIsChangingPw(true);
+            type ForgotPasswordResponse = {
+              ok: boolean;
+              status: number;
+              message?: string;
+              [key: string]: any;
+            };
+            try {
+              const response = await forgotPassword(changePwForm.email) as ForgotPasswordResponse;
+              if (response.ok) {
+                toast.success(
+                  typeof response.message === 'string' && response.message.length > 0
+                    ? response.message
+                    : 'تم إرسال رابط تغيير كلمة المرور إلى بريدك الإلكتروني'
+                );
+                setShowChangePassword(false);
+              } else {
+                toast.error('تعذر إرسال طلب تغيير كلمة المرور', {
+                  description:
+                    typeof response.message === 'string' && response.message.length > 0
+                      ? response.message
+                      : 'يرجى التحقق من البريد الإلكتروني والمحاولة مرة أخرى',
+                });
+              }
+            } catch (error) {
+              toast.error('حدث خطأ أثناء إرسال طلب تغيير كلمة المرور');
+            } finally {
+              setIsChangingPw(false);
+            }
+          }}
+        >
+          <Input
+            type="email"
+            required
+            placeholder="البريد الإلكتروني"
+            className="w-full"
+            value={changePwForm.email}
+            onChange={e => setChangePwForm(f => ({ ...f, email: e.target.value }))}
+          />
+          <Input
+            type="password"
+            required
+            placeholder="كلمة المرور الحالية"
+            className="w-full"
+            value={changePwForm.oldPassword}
+            onChange={e => setChangePwForm(f => ({ ...f, oldPassword: e.target.value }))}
+          />
+          <Input
+            type="password"
+            required
+            placeholder="كلمة المرور الجديدة"
+            className="w-full"
+            value={changePwForm.newPassword}
+            onChange={e => setChangePwForm(f => ({ ...f, newPassword: e.target.value }))}
+          />
+          <Input
+            type="password"
+            required
+            placeholder="تأكيد كلمة المرور الجديدة"
+            className="w-full"
+            value={changePwForm.confirmPassword}
+            onChange={e => setChangePwForm(f => ({ ...f, confirmPassword: e.target.value }))}
+          />
+          <Button type="submit" className="w-full bg-primary text-white mt-2" disabled={isChangingPw}>
+            {isChangingPw ? 'جاري الإرسال...' : 'تغيير كلمة المرور'}
+          </Button>
+        </form>
+      </div>
     </div>
+  );
+
+  return (
+    <>
+      {changePasswordModal}
+      <div className="flex flex-col flex-1 min-h-0">
+        <div className="flex flex-1 min-h-0 items-center justify-center">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold text-center">تسجيل الدخول</CardTitle>
+              <CardDescription className="text-center">
+                قم بتسجيل الدخول للوصول إلى البرامج
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>البريد الإلكتروني</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            type="email" 
+                            placeholder="example@example.com"
+                            autoComplete="email"
+                            className="h-12 text-base"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-sm" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>كلمة المرور</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            type="password" 
+                            placeholder="أدخل كلمة المرور"
+                            autoComplete="current-password"
+                            className="h-12 text-base"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-sm" />
+                      </FormItem>
+                    )}
+                  />
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-primary hover:bg-primary/90 text-white h-12 text-base" 
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
+                  </Button>
+                  <p className="text-center text-sm text-muted-foreground">
+                    <button
+                      type="button"
+                      className="text-blue-700 hover:underline font-medium"
+                      style={{ direction: 'rtl' }}
+                      onClick={() => navigate('/forgot-password')}
+                    >
+                      نسيت كلمة المرور؟
+                    </button>
+                  </p>
+                  <p className="text-center text-sm text-muted-foreground">
+                    ليس لديك حساب؟{' '}
+                    <button
+                      type="button"
+                      onClick={() => navigate('/registration')}
+                      className="text-primary hover:text-primary/90 transition-colors font-medium"
+                    >
+                      إنشاء حساب جديد
+                    </button>
+                  </p>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </>
   );
 };
 
