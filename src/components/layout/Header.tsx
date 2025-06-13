@@ -42,6 +42,9 @@ const Header = () => {
                   <NavLink to="/profile" isActive={location.pathname === '/profile'}>
                     الملف الشخصى
                   </NavLink>
+                  <NavLink to="/student/dashboard" isActive={location.pathname === '/student/dashboard'}>
+                   لوحة التحكم
+                  </NavLink>
                   <NavLink to="/program-registration" isActive={location.pathname === '/program-registration'}>
                     تسجيل البرامج
                   </NavLink>
