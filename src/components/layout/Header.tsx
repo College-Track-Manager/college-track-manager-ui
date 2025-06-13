@@ -34,19 +34,23 @@ const Header = () => {
             <div className="flex items-center gap-8">
               {isAuthenticated ? (
                 <>
-                  {user?.track && (
-                    <NavLink to="/student/dashboard" isActive={location.pathname.startsWith('/student/dashboard')}>
-                      مقرراتى
+                  {user?.role === 'Admin' && (
+                    <NavLink to="/admin/dashboard" isActive={location.pathname.startsWith('/admin/dashboard')}>
+                      لوحة التحكم
                     </NavLink>
+                  )}
+                  {user?.role === 'Student' && (
+                    <>
+                      <NavLink to="/student/dashboard" isActive={location.pathname.startsWith('/student/dashboard')}>
+                        لوحة التحكم
+                      </NavLink>
+                      <NavLink to="/program-registration" isActive={location.pathname === '/program-registration'}>
+                        تسجيل البرامج
+                      </NavLink>
+                    </>
                   )}
                   <NavLink to="/profile" isActive={location.pathname === '/profile'}>
                     الملف الشخصى
-                  </NavLink>
-                  <NavLink to="/student/dashboard" isActive={location.pathname === '/student/dashboard'}>
-                   لوحة التحكم
-                  </NavLink>
-                  <NavLink to="/program-registration" isActive={location.pathname === '/program-registration'}>
-                    تسجيل البرامج
                   </NavLink>
                   <button
                     onClick={logout}
@@ -60,14 +64,14 @@ const Header = () => {
                   </button>
                 </>
               ) : (
-                <NavLink to="/login" isActive={location.pathname === '/login'}>
-                  تسجيل الدخول
-                </NavLink>
-              )}
-              {!isAuthenticated && (
-                <NavLink to="/registration" isActive={location.pathname === '/registration'}>
-                  إنشاء حساب
-                </NavLink>
+                <>
+                  <NavLink to="/login" isActive={location.pathname === '/login'}>
+                    تسجيل الدخول
+                  </NavLink>
+                  <NavLink to="/registration" isActive={location.pathname === '/registration'}>
+                    إنشاء حساب
+                  </NavLink>
+                </>
               )}
             </div>
           </nav>
