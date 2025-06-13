@@ -31,6 +31,11 @@ const Header = () => {
             <NavLink to="/tracks" isActive={location.pathname.startsWith('/tracks')}>
               البرامج
             </NavLink>
+            {isAuthenticated && (
+              <NavLink to="/profile" isActive={location.pathname === '/profile'}>
+                الملف الشخصى
+              </NavLink>
+            )}
             <div className="flex items-center gap-8">
               {isAuthenticated ? (
                 <>
@@ -49,9 +54,6 @@ const Header = () => {
                       </NavLink>
                     </>
                   )}
-                  <NavLink to="/profile" isActive={location.pathname === '/profile'}>
-                    الملف الشخصى
-                  </NavLink>
                   <button
                     onClick={logout}
                     className={cn(
