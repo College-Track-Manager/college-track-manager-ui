@@ -77,9 +77,9 @@ const StudentDashboard = () => {
   return (
     <PageTransition>
       <div className="container mx-auto py-8" dir="rtl">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="md:col-span-2">
-            <CardHeader className="flex flex-row items-center gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 items-stretch">
+          <Card className="md:col-span-1 h-full flex flex-col">
+            <CardHeader className="flex-1 flex flex-col justify-center items-center gap-4">
               <Avatar className="h-16 w-16">
                 <AvatarImage src={user?.avatar || '/placeholder.svg'} alt={profile.fullName} />
                 <AvatarFallback>{profile.fullName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
@@ -94,7 +94,7 @@ const StudentDashboard = () => {
             </CardHeader>
           </Card>
 
-          <Card>
+          <Card className="md:col-span-1 h-full">
             <CardHeader>
               <CardTitle className="text-lg">معلومات المسار الأكاديمي</CardTitle>
             </CardHeader>
