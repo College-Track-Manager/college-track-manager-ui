@@ -156,8 +156,8 @@ const AdminDashboard = () => {
                         </div>
                       </div>
                       <div className="flex gap-2">
+                        <Button size="sm" variant="default" className="flex-1">تأكيد الدفع</Button>
                         <Button size="sm" variant="outline" className="flex-1">عرض الإيصال</Button>
-                        <Button size="sm" className="flex-1">تأكيد الدفع</Button>
                       </div>
                     </div>
                   ))}
