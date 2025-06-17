@@ -7,11 +7,23 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 
+import React from 'react'; // Added React for useState
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
+  const [isReceiptDialogOpen, setIsReceiptDialogOpen] = React.useState(false);
+  const [selectedReceiptUrl, setSelectedReceiptUrl] = React.useState<string | null>(null);
   const navigate = useNavigate();
   const { user } = useAuth();
   // Mock data for pending applications
@@ -30,9 +42,10 @@ const AdminDashboard = () => {
   ];
 
   // Mock data for payments pending confirmation
+  // Mock data for payments pending confirmation
   const pendingPayments = [
-    { id: 4, name: "مريم حسن", track: "الذكاء الاصطناعي وتعلم الآلة", date: "2023-09-14", amount: "٢,٥٠٠ ريال" },
-    { id: 7, name: "خالد عمر", track: "علوم الحاسوب", date: "2023-09-18", amount: "٢,٢٠٠ ريال" },
+    { id: 4, name: "مريم حسن", track: "الذكاء الاصطناعي وتعلم الآلة", date: "2023-09-14", amount: "٢,٥٠٠ ريال", receiptImageUrl: "https://via.placeholder.com/400x600.png?text=Receipt+Maryam" },
+    { id: 7, name: "خالد عمر", track: "علوم الحاسوب", date: "2023-09-18", amount: "٢,٢٠٠ ريال", receiptImageUrl: "https://via.placeholder.com/400x600.png?text=Receipt+Khaled" },
   ];
 
   const getStatusBadge = (status: string) => {
@@ -157,7 +170,7 @@ const AdminDashboard = () => {
                       </div>
                       <div className="flex gap-2">
                         <Button size="sm" variant="default" className="flex-1">تأكيد الدفع</Button>
-                        <Button size="sm" variant="outline" className="flex-1">عرض الإيصال</Button>
+                        <Button size="sm" variant="outline" className="flex-1" onClick={() => { setSelectedReceiptUrl(payment.receiptImageUrl); setIsReceiptDialogOpen(true); }}>عرض الإيصال</Button>
                       </div>
                     </div>
                   ))}
@@ -168,6 +181,37 @@ const AdminDashboard = () => {
 
 
         </Tabs>
+
+        <Dialog open={isReceiptDialogOpen} onOpenChange={setIsReceiptDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]" dir="rtl">
+            <DialogHeader>
+              <DialogTitle>عرض إيصال الدفع</DialogTitle>
+              <DialogDescription>
+                تفاصيل إيصال الدفع. يمكنك تحميل نسخة من الإيصال.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              {selectedReceiptUrl ? (
+                <img src={selectedReceiptUrl} alt="إيصال الدفع" className="max-w-full h-auto rounded-md" />
+              ) : (
+                <p>لا يمكن عرض الإيصال.</p>
+              )}
+            </div>
+            <DialogFooter className="sm:justify-start">
+              {selectedReceiptUrl && (
+                <Button asChild variant="default">
+                  <a href={selectedReceiptUrl} download={`receipt-${Date.now()}.png`}>تحميل الإيصال</a>
+                </Button>
+              )}
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  إغلاق
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
       </div>
     </PageTransition>
   );
