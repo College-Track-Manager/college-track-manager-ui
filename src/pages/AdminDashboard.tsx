@@ -9,8 +9,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { useAuth } from '@/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   // Mock data for pending applications
   const pendingApplications = [
@@ -87,7 +89,7 @@ const AdminDashboard = () => {
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-2 mt-3 justify-end">
-<Button size="sm" variant="default">مراجعة</Button>
+<Button size="sm" variant="default" onClick={() => navigate(`/admin/review-application/${app.id}`)}>مراجعة</Button>
                         </div>
                       </div>
                     ))}
