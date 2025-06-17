@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Search } from 'lucide-react';
+import { ArrowLeft, Search } from 'lucide-react';
 import PageTransition from '@/components/ui/PageTransition';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -181,7 +181,6 @@ const TrackCard = ({ track, index }: { track: Track, index: number }) => {
       </div>
       <div className="p-6 flex flex-col flex-grow">
         <div className="flex items-start justify-between mb-3">
-          <span className="text-xs bg-secondary px-2 py-1 rounded-full">{track.duration}</span>
           <h3 className="text-xl font-semibold">{track.title}</h3>
         </div>
         <p className="text-muted-foreground text-sm line-clamp-3 flex-grow">{track.shortDescription}</p>
@@ -190,7 +189,7 @@ const TrackCard = ({ track, index }: { track: Track, index: number }) => {
             to={`/tracks/${track.id}`}
             className="inline-flex items-center justify-center w-full py-2.5 bg-secondary hover:bg-secondary/80 rounded-md text-sm font-medium transition-colors"
           >
-            عرض التفاصيل <ArrowRight size={16} className="mr-1" />
+            عرض التفاصيل <ArrowLeft size={16} className="mr-1" />
           </Link>
         </div>
       </div>

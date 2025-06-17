@@ -41,13 +41,15 @@ const ProgramRegistration = () => {
 
   // Read trackId and type from query params
   const searchParams = new URLSearchParams(window.location.search);
-  const preselectedTrackId = searchParams.get('trackId') || '';
-  const preselectedType = searchParams.get('type') ? Number(searchParams.get('type')) : 1;
+  const hasTrackParams = searchParams.has('trackId') && searchParams.has('type');
+  const preselectedTrackId = hasTrackParams ? searchParams.get('trackId') || '' : '';
+  const preselectedType = hasTrackParams ? (Number(searchParams.get('type')) === 2 ? 2 : 1) : null;
 
   const form = useForm<ProgramFormValues>({
     resolver: zodResolver(programSchema),
     defaultValues: {
-      track: preselectedTrackId,
+      trackType: null,
+      track: '',
       educationLevel: '',
       studyType: undefined as any,
       education: '',
@@ -59,16 +61,23 @@ const ProgramRegistration = () => {
   const trackType = form.watch('trackType');
   const { data: tracks = [], isLoading: tracksLoading } = useTracksByType(trackType);
 
-  // Preselect the track after tracks are loaded
+  // Set initial trackType and track when component mounts if they are provided in URL
   useEffect(() => {
-    if (
-      preselectedTrackId &&
-      tracks.length > 0 &&
-      tracks.some(t => String(t.id) === preselectedTrackId)
-    ) {
-      form.setValue('track', preselectedTrackId);
+    if (preselectedType !== null) {
+      // Type assertion to ensure trackType is 1 or 2
+      const trackType = (preselectedType === 2 ? 2 : 1) as 1 | 2;
+      form.setValue('trackType', trackType);
+      
+      // Preselect the track after tracks are loaded
+      if (
+        preselectedTrackId &&
+        tracks.length > 0 &&
+        tracks.some(t => String(t.id) === preselectedTrackId)
+      ) {
+        form.setValue('track', preselectedTrackId);
+      }
     }
-  }, [tracks, preselectedTrackId, form]);
+  }, [preselectedType, preselectedTrackId, tracks, form]);
 
   const handleDocumentUpload = (type, e) => {
     const file = e.target.files[0];

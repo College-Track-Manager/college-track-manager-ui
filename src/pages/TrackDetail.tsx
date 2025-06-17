@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Clock, FileText, GraduationCap, Briefcase, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Clock, FileText, GraduationCap, Briefcase, CheckCircle } from 'lucide-react';
 import PageTransition from '@/components/ui/PageTransition';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -100,23 +100,7 @@ const TrackOverview = ({ track }) => {
         />
       </div>
       
-      <h1 className="mt-6 text-3xl md:text-4xl font-bold text-right" dir="rtl">{track.title}</h1>
-
-<div className="mt-4 flex flex-row-reverse gap-2 justify-end text-right" dir="rtl">
-  <div className="flex items-center bg-secondary/60 rounded-full px-4 py-1 text-sm">
-    <Clock size={16} className="ml-1 text-muted-foreground" />
-    <span>{track.duration}</span>
-  </div>
-  <div className="flex items-center bg-secondary/60 rounded-full px-4 py-1 text-sm">
-    <FileText size={16} className="ml-1 text-muted-foreground" />
-    <span>{track.courses?.length || 0} دورات</span>
-  </div>
-  <div className="flex items-center bg-secondary/60 rounded-full px-4 py-1 text-sm">
-    <GraduationCap size={16} className="ml-1 text-muted-foreground" />
-    <span>شهادة مهنية</span>
-  </div>
-</div>
-      
+      <h1 className="mt-6 text-3xl md:text-4xl font-bold text-right" dir="rtl">{track.title}</h1>      
       <p className="mt-6 text-lg text-right" dir="rtl">{track.fullDescription}</p>
     </motion.div>
   );
@@ -125,7 +109,6 @@ const TrackOverview = ({ track }) => {
 const TrackTabs = ({ track }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
-  const [activeTab, setActiveTab] = useState('careers');
   
   return (
     <motion.div
@@ -135,34 +118,10 @@ const TrackTabs = ({ track }) => {
       transition={{ duration: 0.5, delay: 0.2 }}
       className="mt-12"
     >
-      <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="careers">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="courses">الدورات</TabsTrigger>
+      <Tabs value="requirements" defaultValue="requirements">
+        <TabsList className="w-full">
           <TabsTrigger value="requirements">المتطلبات</TabsTrigger>
-          <TabsTrigger value="careers">الآفاق المهنية</TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="courses" className="mt-6 text-right" dir="rtl">
-          <div className="space-y-6">
-            {Array.isArray(track.courses) && track.courses.length > 0 ? (
-              track.courses.map((course) => (
-                <div key={course.id} className="bg-secondary/30 p-6 rounded-lg text-right" dir="rtl">
-                  <div className="flex flex-row-reverse items-start">
-  <div className="text-sm bg-secondary px-2 py-1 rounded-full flex-shrink-0" style={{ minWidth: 90, textAlign: 'center' }}>
-    {course.credits} ساعات معتمدة
-  </div>
-  <div className="flex-1 mr-4">
-    <h3 className="font-semibold">{course.title}</h3>
-    <p className="mt-1 text-sm text-muted-foreground">{course.description}</p>
-  </div>
-</div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center text-muted-foreground py-8">لا توجد دورات متاحة لهذا البرنامج حالياً.</div>
-            )}
-          </div>
-        </TabsContent>
         
         <TabsContent value="requirements" className="mt-6 text-right" dir="rtl">
           <div className="bg-secondary/30 p-6 rounded-lg text-right" dir="rtl">
@@ -170,39 +129,15 @@ const TrackTabs = ({ track }) => {
             <ul className="mt-4 space-y-3">
               {track.requirements.map((requirement, index) => (
                 <li key={index} className="flex flex-row-reverse items-center text-right mb-2" dir="rtl">
-  <span className="flex-1">{requirement}</span>
-  <CheckCircle size={18} className="ml-2 flex-shrink-0 text-primary" />
-</li>
+                  <span className="flex-1">{requirement}</span>
+                  <CheckCircle size={18} className="ml-2 flex-shrink-0 text-primary" />
+                </li>
               ))}
             </ul>
             <Separator className="my-6" />
             <p className="text-sm text-muted-foreground">
               متطلبات القبول قابلة للتغيير. يرجى الاتصال بمكتب القبول للحصول على أحدث المعلومات.
             </p>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="careers" className="mt-6 text-right" dir="rtl">
-          <div className="bg-secondary/30 p-6 rounded-lg text-right" dir="rtl">
-            <div className="flex flex-row-reverse items-start">
-              <Briefcase size={24} className="ml-3 text-primary" />
-              <div>
-                <h3 className="font-semibold">الفرص المهنية</h3>
-                <p className="mt-2">{track.careerOutlook}</p>
-              </div>
-            </div>
-            <Separator className="my-6" />
-            <div className="mt-4">
-              <h4 className="font-medium">المسارات المهنية المحتملة:</h4>
-              <ul className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
-                {[1, 2, 3, 4].map((_, i) => (
-                  <li key={i} className="flex flex-row-reverse items-center text-right mb-2" dir="rtl">
-  <span className="flex-1">الدور المهني {i + 1}</span>
-  <CheckCircle size={16} className="ml-2 text-primary" />
-</li>
-                ))}
-              </ul>
-            </div>
           </div>
         </TabsContent>
       </Tabs>
@@ -228,19 +163,15 @@ const TrackSidebar = ({ track }) => {
       </p>
       
       <div className="mt-6 space-y-4">
-        <div className="flex justify-between text-sm">
-          <span>المدة:</span>
-          <span className="font-medium">{track.duration}</span>
-        </div>
         <Separator />
         <div className="flex justify-between text-sm">
           <span>تاريخ البدء:</span>
-          <span className="font-medium">سبتمبر ٢٠٢٣</span>
+          <span className="font-medium">سبتمبر ٢٠٢٥</span>
         </div>
         <Separator />
         <div className="flex justify-between text-sm">
           <span>الموعد النهائي للتقديم:</span>
-          <span className="font-medium">١٥ أغسطس ٢٠٢٣</span>
+          <span className="font-medium">١٥ أغسطس ٢٠٢٥</span>
         </div>
         <Separator />
         <div className="flex justify-between text-sm">
