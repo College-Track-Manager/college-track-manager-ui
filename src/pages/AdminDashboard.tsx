@@ -87,8 +87,7 @@ const AdminDashboard = () => {
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-2 mt-3 justify-end">
-                          <Button size="sm" variant="outline">التفاصيل</Button>
-                          <Button size="sm" variant="default">مراجعة</Button>
+<Button size="sm" variant="default">مراجعة</Button>
                         </div>
                       </div>
                     ))}
