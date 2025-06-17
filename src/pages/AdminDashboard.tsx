@@ -16,17 +16,17 @@ const AdminDashboard = () => {
   const { user } = useAuth();
   // Mock data for pending applications
   const pendingApplications = [
-    { id: 1, name: "أحمد محمد", track: "علوم الحاسوب", date: "2023-09-15", status: "pending" },
+    { id: 6, name: "نورا عبدالله", track: "تطوير تطبيقات الجوال", date: "2023-09-12", status: "disapproved", email: "noura.abdullah@example.com", type: "مهني" },
     { id: 2, name: "سارة أحمد", track: "علوم البيانات", date: "2023-09-16", status: "pending" },
-    { id: 3, name: "علي خالد", track: "الأمن السيبراني", date: "2023-09-17", status: "pending" },
+    { id: 8, name: "فاطمة علي", track: "الأمن السيبراني", date: "2023-09-14", status: "disapproved", email: "fatima.ali@example.com", type: "مهني" },
   ];
 
   // Mock data for reviewed applications
   const reviewedApplications = [
-    { id: 4, name: "مريم حسن", track: "الذكاء الاصطناعي وتعلم الآلة", date: "2023-09-10", status: "accepted" },
-    { id: 5, name: "محمد إبراهيم", track: "تطوير الويب", date: "2023-09-11", status: "rejected" },
+    { id: 4, name: "مريم حسن", track: "الذكاء الاصطناعي وتعلم الآلة", date: "2023-09-10", status: "approved", email: "sara.fahad@example.com", type: "مهني" },
+    { id: 5, name: "محمد إبراهيم", track: "تطوير الويب", date: "2023-09-11", status: "disapproved", email: "mohammed.ibrahim@example.com", type: "أكاديمي" },
     { id: 6, name: "نورا عبدالله", track: "تطوير تطبيقات الجوال", date: "2023-09-12", status: "modified" },
-    { id: 7, name: "خالد عمر", track: "علوم الحاسوب", date: "2023-09-13", status: "accepted" },
+    { id: 7, name: "خالد عمر", track: "علوم الحاسوب", date: "2023-09-13", status: "approved", email: "khaled.omar@example.com", type: "أكاديمي" },
   ];
 
   // Mock data for payments pending confirmation
@@ -45,6 +45,10 @@ const AdminDashboard = () => {
         return <Badge variant="outline" className="border-amber-500 text-amber-500">طلب تعديل</Badge>;
       case "pending":
         return <Badge variant="outline" className="border-blue-500 text-blue-500">قيد المراجعة</Badge>;
+      case "disapproved":
+        return <Badge variant="outline" className="border-red-500 text-red-500">مرفوض</Badge>;
+      case "approved":
+        return <Badge variant="outline" className="border-green-500 text-green-500">مقبول</Badge>;
       default:
         return <Badge variant="outline">غير معروف</Badge>;
     }
@@ -89,7 +93,7 @@ const AdminDashboard = () => {
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-2 mt-3 justify-end">
-<Button size="sm" variant="default" onClick={() => navigate(`/admin/review-application/${app.id}`)}>مراجعة</Button>
+                          <Button size="sm" variant="default" onClick={() => navigate(`/admin/review-application/${app.id}`)}>مراجعة</Button>
                         </div>
                       </div>
                     ))}
@@ -121,7 +125,7 @@ const AdminDashboard = () => {
                           </div>
                         </div>
                         <p className="text-sm text-muted-foreground mt-1 mb-3 text-right">تاريخ المراجعة: {app.date}</p>
-                        <Button size="sm" variant="outline" className="w-full">عرض التفاصيل</Button>
+                        <Button size="sm" variant="outline" onClick={() => navigate(`/admin/review-application/${app.id}`, { state: { isReadOnlyView: true, status: app.status, applicantName: app.name, trackName: app.track } })}>عرض التفاصيل</Button>
                       </div>
                     ))}
                   </ScrollArea>

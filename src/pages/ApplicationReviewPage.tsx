@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import PageTransition from '@/components/ui/PageTransition';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -27,16 +27,22 @@ interface ApplicationData {
 }
 
 const ApplicationReviewPage = () => {
+  const location = useLocation();
+  const { isReadOnlyView, status: applicationFinalStatus, applicantName: routeApplicantName, trackName: routeTrackName } = (location.state as { isReadOnlyView?: boolean; status?: string; applicantName?: string; trackName?: string; }) || {};
   const { applicationId } = useParams<{ applicationId: string }>();
 
+    // Use route params for initial display if available, then fetch full data
+  const initialName = routeApplicantName || 'جاري التحميل...';
+  const initialTrack = routeTrackName || 'جاري التحميل...';
+
   // TODO: Fetch application data based on applicationId
-  // For now, using mock data
+  // For now, using mock data that incorporates initial route params
   const mockApplication: ApplicationData = {
     id: applicationId || '1',
-    name: 'أحمد محمد الغامدي',
-    email: 'ahmed.alghamdi@example.com',
-    trackType: 'academic',
-    track: 'علوم الحاسوب المتقدمة',
+    name: initialName,
+    email: 'ahmed.alghamdi@example.com', // This will be overwritten by actual fetch
+    trackType: 'academic', // This will be overwritten
+    track: initialTrack,
     educationLevel: 'ماجستير',
     studyType: 'online',
     education: 'بكالوريوس هندسة برمجيات - جامعة الملك سعود (2020)',
@@ -46,7 +52,6 @@ const ApplicationReviewPage = () => {
     idCardUrl: '#',
     submissionDate: '2023-09-15',
   };
-
   const [applicationData, setApplicationData] = React.useState<ApplicationData | null>(mockApplication);
   const [isLoading, setIsLoading] = React.useState(false); // Set to true when fetching data
   const [error, setError] = React.useState<string | null>(null);
@@ -152,7 +157,9 @@ const ApplicationReviewPage = () => {
         <Card className="max-w-3xl mx-auto">
           <CardHeader>
             <CardTitle className="text-2xl">مراجعة طلب تسجيل برنامج</CardTitle>
-            <CardDescription>مراجعة تفاصيل طلب الطالب واتخاذ قرار.</CardDescription>
+            <CardDescription>
+              {isReadOnlyView ? 'عرض تفاصيل الطلب المقدم.' : 'مراجعة تفاصيل طلب الطالب واتخاذ قرار.'}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Personal Information Section */}
@@ -224,14 +231,35 @@ const ApplicationReviewPage = () => {
               )}
             </div>
 
-            <div className="flex flex-col md:flex-row gap-4 pt-6 border-t mt-6">
-              <Button onClick={handleApprove} className="flex-1 bg-green-600 hover:bg-green-700">
-                موافقة على الطلب
-              </Button>
-              <Button onClick={handleDisapprove} variant="destructive" className="flex-1">
-                رفض الطلب
-              </Button>
-            </div>
+            {isReadOnlyView ? (
+              <div className="pt-6 border-t mt-6">
+                <h4 className="font-semibold mb-2">حالة الطلب النهائية:</h4>
+                {applicationFinalStatus === 'approved' && (
+                  <p className="text-lg font-semibold text-green-600 p-3 bg-green-50 rounded-md border border-green-200">الطالب مقبول (Approved)</p>
+                )}
+                {applicationFinalStatus === 'disapproved' && (
+                  <p className="text-lg font-semibold text-red-600 p-3 bg-red-50 rounded-md border border-red-200">الطالب مرفوض (Disapproved)</p>
+                )}
+                {applicationFinalStatus === 'accepted' && ( // Assuming 'accepted' is similar to 'approved'
+                  <p className="text-lg font-semibold text-green-600 p-3 bg-green-50 rounded-md border border-green-200">الطالب مقبول (Approved)</p>
+                )}
+                {applicationFinalStatus === 'rejected' && ( // Assuming 'rejected' is similar to 'disapproved'
+                  <p className="text-lg font-semibold text-red-600 p-3 bg-red-50 rounded-md border border-red-200">الطالب مرفوض (Disapproved)</p>
+                )}
+                 {!(applicationFinalStatus === 'approved' || applicationFinalStatus === 'disapproved' || applicationFinalStatus === 'accepted' || applicationFinalStatus === 'rejected') && (
+                  <p className="text-lg font-semibold text-gray-600 p-3 bg-gray-50 rounded-md border border-gray-200">حالة الطلب: {applicationFinalStatus || 'غير محددة'}</p>
+                )}
+              </div>
+            ) : (
+              <div className="flex flex-col md:flex-row gap-4 pt-6 border-t mt-6">
+                <Button onClick={handleApprove} className="flex-1 bg-green-600 hover:bg-green-700">
+                  موافقة على الطلب
+                </Button>
+                <Button onClick={handleDisapprove} variant="destructive" className="flex-1">
+                  رفض الطلب
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
