@@ -58,7 +58,7 @@ const AdminDashboard = () => {
           <TabsList className="mb-6">
             <TabsTrigger value="applications">الطلبات</TabsTrigger>
             <TabsTrigger value="payments">المدفوعات</TabsTrigger>
-            <TabsTrigger value="courses">إدارة الدورات</TabsTrigger>
+
           </TabsList>
 
           <TabsContent value="applications">
@@ -161,20 +161,7 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="courses">
-            <Card>
-              <CardHeader>
-                <CardTitle>إدارة الدورات</CardTitle>
-                <CardDescription>إدارة الدورات وتسجيلات الطلاب</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-20">
-                  <p className="text-muted-foreground">ميزات إدارة الدورات قادمة قريبًا</p>
-                  <Button className="mt-4">إنشاء دورة جديدة</Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+
         </Tabs>
       </div>
     </PageTransition>
