@@ -24,6 +24,8 @@ import { useNavigate } from 'react-router-dom';
 const AdminDashboard = () => {
   const [isReceiptDialogOpen, setIsReceiptDialogOpen] = React.useState(false);
   const [selectedReceiptUrl, setSelectedReceiptUrl] = React.useState<string | null>(null);
+  const [isConfirmPaymentDialogOpen, setIsConfirmPaymentDialogOpen] = React.useState(false);
+  const [paymentToConfirmId, setPaymentToConfirmId] = React.useState<number | null>(null);
   const navigate = useNavigate();
   const { user } = useAuth();
   // Mock data for pending applications
@@ -169,7 +171,7 @@ const AdminDashboard = () => {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="default" className="flex-1">تأكيد الدفع</Button>
+                        <Button size="sm" variant="default" className="flex-1" onClick={() => { setPaymentToConfirmId(payment.id); setIsConfirmPaymentDialogOpen(true); }}>تأكيد الدفع</Button>
                         <Button size="sm" variant="outline" className="flex-1" onClick={() => { setSelectedReceiptUrl(payment.receiptImageUrl); setIsReceiptDialogOpen(true); }}>عرض الإيصال</Button>
                       </div>
                     </div>
@@ -206,6 +208,33 @@ const AdminDashboard = () => {
               <DialogClose asChild>
                 <Button type="button" variant="outline">
                   إغلاق
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isConfirmPaymentDialogOpen} onOpenChange={setIsConfirmPaymentDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]" dir="rtl">
+            <DialogHeader>
+              <DialogTitle>تأكيد عملية الدفع</DialogTitle>
+              <DialogDescription>
+                هل أنت متأكد من رغبتك في تأكيد هذا الدفع؟ لا يمكن التراجع عن هذا الإجراء.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="sm:justify-start gap-2 pt-4">
+              <Button variant="default" onClick={() => {
+                // TODO: Implement actual payment confirmation logic here (e.g., API call)
+                console.log(`Payment confirmed for ID: ${paymentToConfirmId}`);
+                setIsConfirmPaymentDialogOpen(false);
+                setPaymentToConfirmId(null);
+                // Optionally, refresh payments list or remove the confirmed payment from the list
+              }}>
+                نعم، تأكيد الدفع
+              </Button>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  إلغاء
                 </Button>
               </DialogClose>
             </DialogFooter>
