@@ -4,7 +4,9 @@ import { motion, useInView } from 'framer-motion';
 import PageTransition from '@/components/ui/PageTransition';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Track, useTracksByType } from '@/services/tracks';
+import axios from 'axios';
+import { API_BASE_URL } from '@/services/config';
+import { Track } from '@/services/tracks';
 
 const Index = () => {
   return <PageTransition>
@@ -68,34 +70,91 @@ const AboutSection = () => {
     </section>;
 };
 
+const AcademicPrograms = ({ isInView }: { isInView: boolean }) => {
+  const [tracks, setTracks] = useState<Track[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const fetchAcademicTracks = async () => {
+      console.log('AcademicPrograms: Fetching tracks. API_BASE_URL:', API_BASE_URL);
+      setIsLoading(true);
+      setError(null); // Reset error state before new fetch
+      try {
+        const response = await axios.get<Track[]>(`${API_BASE_URL}/api/Tracks?tracktype=0`);
+        setTracks(response.data);
+        console.log('Academic tracks data (direct fetch):', response.data);
+      } catch (err) {
+        console.error('Error fetching academic tracks (direct fetch):', err);
+        setError(err as Error);
+        setTracks([]); // Clear tracks on error
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchAcademicTracks();
+  }, []);
+
+  if (error) {
+    console.error('Render error for academic tracks:', error);
+  }
+
+  return <ProgramsContent tracks={tracks} isLoading={isLoading} isInView={isInView} />;
+};
+
+const ProfessionalPrograms = ({ isInView }: { isInView: boolean }) => {
+  const [tracks, setTracks] = useState<Track[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const fetchProfessionalTracks = async () => {
+      console.log('ProfessionalPrograms: Fetching tracks. API_BASE_URL:', API_BASE_URL);
+      setIsLoading(true);
+      setError(null); // Reset error state before new fetch
+      try {
+        const response = await axios.get<Track[]>(`${API_BASE_URL}/api/Tracks?tracktype=1`);
+        setTracks(response.data);
+        console.log('Professional tracks data (direct fetch):', response.data);
+      } catch (err) {
+        console.error('Error fetching professional tracks (direct fetch):', err);
+        setError(err as Error);
+        setTracks([]); // Clear tracks on error
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProfessionalTracks();
+  }, []);
+
+  if (error) {
+    console.error('Render error for professional tracks:', error);
+  }
+
+  return <ProgramsContent tracks={tracks} isLoading={isLoading} isInView={isInView} />;
+};
+
 const ProgramsTabsSection = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
-  const [activeTab, setActiveTab] = useState<'professional' | 'academic'>('academic');
-  
-  const { data: tracks = [], isLoading } = useTracksByType(activeTab);
-
-  const handleTabChange = (value: string) => {
-    setActiveTab(value as 'professional' | 'academic');
-  };
 
   return (
     <section ref={ref} className="py-16 bg-gray-50">
       <div className="container-content">
         <h2 className="text-3xl font-bold text-[#002b4e] text-center mb-8">البرامج</h2>
         
-        <Tabs defaultValue="academic" className="w-full" onValueChange={handleTabChange}>
+        <Tabs defaultValue="academic" className="w-full">
           <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8 justify-end" dir="rtl">
             <TabsTrigger value="academic">البرامج الأكاديمية</TabsTrigger>
             <TabsTrigger value="professional">البرامج المهنية</TabsTrigger>
           </TabsList>
           
           <TabsContent value="academic">
-            <ProgramsContent tracks={tracks.slice(0, 3)} isLoading={isLoading} isInView={isInView} />
+            <AcademicPrograms isInView={isInView} />
           </TabsContent>
 
           <TabsContent value="professional">
-            <ProgramsContent tracks={tracks.slice(0, 3)} isLoading={isLoading} isInView={isInView} />
+            <ProfessionalPrograms isInView={isInView} />
           </TabsContent>
         </Tabs>
       </div>
@@ -103,7 +162,13 @@ const ProgramsTabsSection = () => {
   );
 };
 
-const ProgramsContent = ({ tracks, isLoading, isInView }) => {
+interface ProgramsContentProps {
+  tracks: Track[];
+  isLoading: boolean;
+  isInView: boolean;
+}
+
+const ProgramsContent = ({ tracks, isLoading, isInView }: ProgramsContentProps) => {
   if (isLoading) {
     return (
       <div className="text-center py-12">
@@ -113,7 +178,7 @@ const ProgramsContent = ({ tracks, isLoading, isInView }) => {
     );
   }
 
-  if (tracks.length === 0) {
+  if (!tracks || tracks.length === 0) {
     return (
       <div className="text-center py-12">
         <p>لم يتم العثور على برامج</p>

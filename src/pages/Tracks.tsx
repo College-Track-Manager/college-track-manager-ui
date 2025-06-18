@@ -9,7 +9,7 @@ import { useTracksByType, Track, TrackType } from '@/services/tracks';
 
 const Tracks = () => {
   // 1 = academic, 2 = professional
-  const [activeTab, setActiveTab] = useState<TrackType>(1);
+  const [activeTab, setActiveTab] = useState<TrackType>('academic');
   const [searchQuery, setSearchQuery] = useState('');
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
@@ -61,16 +61,16 @@ const Tracks = () => {
 
           {/* Tabs Section */}
           <Tabs
-            defaultValue="1"
+            defaultValue="academic"
             className="w-full mt-10"
-            onValueChange={(value) => setActiveTab(Number(value) as TrackType)}
+            onValueChange={(value) => setActiveTab(value as TrackType)}
           >
             <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
-              <TabsTrigger value="2">البرامج المهنية</TabsTrigger>
-              <TabsTrigger value="1">البرامج الأكاديمية</TabsTrigger>
+              <TabsTrigger value="professional">البرامج المهنية</TabsTrigger>
+              <TabsTrigger value="academic">البرامج الأكاديمية</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="1">
+            <TabsContent value="academic">
               <TracksContent 
                 tracks={filteredTracks} 
                 isLoading={isLoading} 
@@ -79,7 +79,7 @@ const Tracks = () => {
               />
             </TabsContent>
 
-            <TabsContent value="2">
+            <TabsContent value="professional">
               <TracksContent 
                 tracks={filteredTracks} 
                 isLoading={isLoading} 
