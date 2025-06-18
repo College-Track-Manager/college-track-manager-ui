@@ -25,8 +25,8 @@ const Profile = () => {
             <Input value={user?.nationalId || ''} disabled className="bg-gray-200 " />
           </div>
           <div>
-            <label className="block mb-1 font-medium">العنوان </label>
-            <Input value={user?.address || ''} disabled className="bg-gray-200" />
+            <label className="block mb-1 font-medium">رقم الهاتف </label>
+            <Input value={user?.phone || ''} disabled className="bg-gray-200" />
           </div>
         </CardContent>
       </Card>
