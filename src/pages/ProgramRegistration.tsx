@@ -24,7 +24,7 @@ const programSchema = z.object({
   educationLevel: z.string().min(1, { message: 'الرجاء اختيار المرحلة الدراسية' }),
   studyType: z.enum(['online', 'offline'], { required_error: 'الرجاء اختيار نوع الدراسة' }),
   education: z.string()
-    .min(5, { message: 'يجب أن تحتوي الخلفية التعليمية على الأقل على 5 أحرف' })
+    .min(5, { message: 'الخلفية التعليمية مطلوبة' })
     .max(500, { message: 'يجب ألا تتجاوز الخلفية التعليمية 500 حرف' }),
   statement: z.string()
     .min(1, { message: 'الرسالة الشخصية مطلوبة' })
