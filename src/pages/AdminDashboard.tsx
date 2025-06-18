@@ -7,30 +7,47 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 
+import React from 'react'; // Added React for useState
 import { useAuth } from '@/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
+  const [isReceiptDialogOpen, setIsReceiptDialogOpen] = React.useState(false);
+  const [selectedReceiptUrl, setSelectedReceiptUrl] = React.useState<string | null>(null);
+  const [isConfirmPaymentDialogOpen, setIsConfirmPaymentDialogOpen] = React.useState(false);
+  const [paymentToConfirmId, setPaymentToConfirmId] = React.useState<number | null>(null);
+  const navigate = useNavigate();
   const { user } = useAuth();
   // Mock data for pending applications
   const pendingApplications = [
-    { id: 1, name: "أحمد محمد", track: "علوم الحاسوب", date: "2023-09-15", status: "pending" },
+    { id: 6, name: "نورا عبدالله", track: "تطوير تطبيقات الجوال", date: "2023-09-12", status: "disapproved", email: "noura.abdullah@example.com", type: "مهني" },
     { id: 2, name: "سارة أحمد", track: "علوم البيانات", date: "2023-09-16", status: "pending" },
-    { id: 3, name: "علي خالد", track: "الأمن السيبراني", date: "2023-09-17", status: "pending" },
+    { id: 8, name: "فاطمة علي", track: "الأمن السيبراني", date: "2023-09-14", status: "disapproved", email: "fatima.ali@example.com", type: "مهني" },
   ];
 
   // Mock data for reviewed applications
   const reviewedApplications = [
-    { id: 4, name: "مريم حسن", track: "الذكاء الاصطناعي وتعلم الآلة", date: "2023-09-10", status: "accepted" },
-    { id: 5, name: "محمد إبراهيم", track: "تطوير الويب", date: "2023-09-11", status: "rejected" },
+    { id: 4, name: "مريم حسن", track: "الذكاء الاصطناعي وتعلم الآلة", date: "2023-09-10", status: "approved", email: "sara.fahad@example.com", type: "مهني" },
+    { id: 5, name: "محمد إبراهيم", track: "تطوير الويب", date: "2023-09-11", status: "disapproved", email: "mohammed.ibrahim@example.com", type: "أكاديمي" },
     { id: 6, name: "نورا عبدالله", track: "تطوير تطبيقات الجوال", date: "2023-09-12", status: "modified" },
-    { id: 7, name: "خالد عمر", track: "علوم الحاسوب", date: "2023-09-13", status: "accepted" },
+    { id: 7, name: "خالد عمر", track: "علوم الحاسوب", date: "2023-09-13", status: "approved", email: "khaled.omar@example.com", type: "أكاديمي" },
   ];
 
   // Mock data for payments pending confirmation
+  // Mock data for payments pending confirmation
   const pendingPayments = [
-    { id: 4, name: "مريم حسن", track: "الذكاء الاصطناعي وتعلم الآلة", date: "2023-09-14", amount: "٢,٥٠٠ ريال" },
-    { id: 7, name: "خالد عمر", track: "علوم الحاسوب", date: "2023-09-18", amount: "٢,٢٠٠ ريال" },
+    { id: 4, name: "مريم حسن", track: "الذكاء الاصطناعي وتعلم الآلة", date: "2023-09-14", amount: "٢,٥٠٠ ريال", receiptImageUrl: "https://via.placeholder.com/400x600.png?text=Receipt+Maryam" },
+    { id: 7, name: "خالد عمر", track: "علوم الحاسوب", date: "2023-09-18", amount: "٢,٢٠٠ ريال", receiptImageUrl: "https://via.placeholder.com/400x600.png?text=Receipt+Khaled" },
   ];
 
   const getStatusBadge = (status: string) => {
@@ -43,6 +60,10 @@ const AdminDashboard = () => {
         return <Badge variant="outline" className="border-amber-500 text-amber-500">طلب تعديل</Badge>;
       case "pending":
         return <Badge variant="outline" className="border-blue-500 text-blue-500">قيد المراجعة</Badge>;
+      case "disapproved":
+        return <Badge variant="outline" className="border-red-500 text-red-500">مرفوض</Badge>;
+      case "approved":
+        return <Badge variant="outline" className="border-green-500 text-green-500">مقبول</Badge>;
       default:
         return <Badge variant="outline">غير معروف</Badge>;
     }
@@ -58,7 +79,7 @@ const AdminDashboard = () => {
           <TabsList className="mb-6">
             <TabsTrigger value="applications">الطلبات</TabsTrigger>
             <TabsTrigger value="payments">المدفوعات</TabsTrigger>
-            <TabsTrigger value="courses">إدارة الدورات</TabsTrigger>
+
           </TabsList>
 
           <TabsContent value="applications">
@@ -87,8 +108,7 @@ const AdminDashboard = () => {
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-2 mt-3 justify-end">
-                          <Button size="sm" variant="outline">التفاصيل</Button>
-                          <Button size="sm" variant="default">مراجعة</Button>
+                          <Button size="sm" variant="default" onClick={() => navigate(`/admin/review-application/${app.id}`)}>مراجعة</Button>
                         </div>
                       </div>
                     ))}
@@ -120,7 +140,7 @@ const AdminDashboard = () => {
                           </div>
                         </div>
                         <p className="text-sm text-muted-foreground mt-1 mb-3 text-right">تاريخ المراجعة: {app.date}</p>
-                        <Button size="sm" variant="outline" className="w-full">عرض التفاصيل</Button>
+                        <Button size="sm" variant="outline" onClick={() => navigate(`/admin/review-application/${app.id}`, { state: { isReadOnlyView: true, status: app.status, applicantName: app.name, trackName: app.track } })}>عرض التفاصيل</Button>
                       </div>
                     ))}
                   </ScrollArea>
@@ -151,8 +171,8 @@ const AdminDashboard = () => {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline" className="flex-1">عرض الإيصال</Button>
-                        <Button size="sm" className="flex-1">تأكيد الدفع</Button>
+                        <Button size="sm" variant="default" className="flex-1" onClick={() => { setPaymentToConfirmId(payment.id); setIsConfirmPaymentDialogOpen(true); }}>تأكيد الدفع</Button>
+                        <Button size="sm" variant="outline" className="flex-1" onClick={() => { setSelectedReceiptUrl(payment.receiptImageUrl); setIsReceiptDialogOpen(true); }}>عرض الإيصال</Button>
                       </div>
                     </div>
                   ))}
@@ -161,21 +181,66 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="courses">
-            <Card>
-              <CardHeader>
-                <CardTitle>إدارة الدورات</CardTitle>
-                <CardDescription>إدارة الدورات وتسجيلات الطلاب</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-20">
-                  <p className="text-muted-foreground">ميزات إدارة الدورات قادمة قريبًا</p>
-                  <Button className="mt-4">إنشاء دورة جديدة</Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+
         </Tabs>
+
+        <Dialog open={isReceiptDialogOpen} onOpenChange={setIsReceiptDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]" dir="rtl">
+            <DialogHeader>
+              <DialogTitle>عرض إيصال الدفع</DialogTitle>
+              <DialogDescription>
+                تفاصيل إيصال الدفع. يمكنك تحميل نسخة من الإيصال.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              {selectedReceiptUrl ? (
+                <img src={selectedReceiptUrl} alt="إيصال الدفع" className="max-w-full h-auto rounded-md" />
+              ) : (
+                <p>لا يمكن عرض الإيصال.</p>
+              )}
+            </div>
+            <DialogFooter className="sm:justify-start">
+              {selectedReceiptUrl && (
+                <Button asChild variant="default">
+                  <a href={selectedReceiptUrl} download={`receipt-${Date.now()}.png`}>تحميل الإيصال</a>
+                </Button>
+              )}
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  إغلاق
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isConfirmPaymentDialogOpen} onOpenChange={setIsConfirmPaymentDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]" dir="rtl">
+            <DialogHeader>
+              <DialogTitle>تأكيد عملية الدفع</DialogTitle>
+              <DialogDescription>
+                هل أنت متأكد من رغبتك في تأكيد هذا الدفع؟ لا يمكن التراجع عن هذا الإجراء.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="sm:justify-start gap-2 pt-4">
+              <Button variant="default" onClick={() => {
+                // TODO: Implement actual payment confirmation logic here (e.g., API call)
+                console.log(`Payment confirmed for ID: ${paymentToConfirmId}`);
+                setIsConfirmPaymentDialogOpen(false);
+                setPaymentToConfirmId(null);
+                // Optionally, refresh payments list or remove the confirmed payment from the list
+              }}>
+                نعم، تأكيد الدفع
+              </Button>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  إلغاء
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
       </div>
     </PageTransition>
   );
