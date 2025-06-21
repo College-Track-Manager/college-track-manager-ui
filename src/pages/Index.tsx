@@ -196,9 +196,12 @@ const ProgramsContent = ({ tracks, isLoading, isInView }: ProgramsContentProps) 
     );
   }
 
+  // Only show first 3 tracks
+  const displayedTracks = tracks.slice(0, 3);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8" dir="rtl">
-      {tracks.map((program, index) => (
+      {displayedTracks.map((program, index) => (
         <motion.div 
           key={program.id} 
           initial={{ opacity: 0, y: 20 }} 
