@@ -155,7 +155,7 @@ const ApplicationReviewPage = () => {
     <PageTransition>
       <div className="container mx-auto py-8 text-right" dir="rtl">
         <Card className="max-w-3xl mx-auto">
-          <CardHeader>
+          <CardHeader className="text-center">
             <CardTitle className="text-2xl">مراجعة طلب تسجيل برنامج</CardTitle>
             <CardDescription>
               {isReadOnlyView ? 'عرض تفاصيل الطلب المقدم.' : 'مراجعة تفاصيل طلب الطالب واتخاذ قرار.'}
