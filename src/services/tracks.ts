@@ -2,7 +2,7 @@ import axios from 'axios';
 import { API_BASE_URL } from './config.ts';
 import { useQuery } from '@tanstack/react-query';
 
-export type TrackType = 'academic' | 'professional' | 1 | 2;
+export type TrackType = 'academic' | 'professional';
 
 export interface Track {
   id: number;
@@ -27,19 +27,13 @@ export interface Course {
   credits: number;
 }
 
-const trackTypeMap: Record<'academic' | 'professional', 1 | 2> = {
-  academic: 1,
-  professional: 2,
+const trackTypeMap: Record<TrackType, number> = {
+  academic: 0,
+  professional: 1,
 };
 
 const fetchTracksByType = async (type: TrackType): Promise<Track[]> => {
-  // Accepts 1, 2, 'academic', or 'professional'
-  let trackTypeValue: 1 | 2;
-  if (type === 1 || type === 2) {
-    trackTypeValue = type;
-  } else {
-    trackTypeValue = trackTypeMap[type];
-  }
+  const trackTypeValue = trackTypeMap[type];
   const response = await axios.get<Track[]>(`${API_BASE_URL}/api/Tracks?tracktype=${trackTypeValue}`);
   return response.data;
 };
