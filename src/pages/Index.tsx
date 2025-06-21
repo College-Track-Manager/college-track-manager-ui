@@ -197,24 +197,37 @@ const ProgramsContent = ({ tracks, isLoading, isInView }: ProgramsContentProps) 
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8" dir="rtl">
       {tracks.map((program, index) => (
         <motion.div 
           key={program.id} 
           initial={{ opacity: 0, y: 20 }} 
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }} 
           transition={{ duration: 0.5, delay: index * 0.1 }} 
-          className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full"
+          className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full hover:shadow-lg transition-shadow duration-300"
         >
           <div className="aspect-video relative overflow-hidden">
-            <img src={program.image} alt={program.title} className="w-full h-full object-cover" />
+            <img 
+              src={program.image} 
+              alt={program.title} 
+              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              loading="lazy"
+            />
           </div>
           <div className="p-6 flex flex-col flex-grow">
-            <h3 className="text-xl font-bold mb-3 text-right">{program.title}</h3>
-            <p className="text-gray-600 mb-4 line-clamp-3 text-right flex-grow">{program.shortDescription}</p>
-            <div className="text-right mt-auto">
-              <Link to={`/tracks/${program.id}`} className="text-primary hover:text-primary/80 font-medium inline-flex items-center">
-                تفاصيل
+            <h3 className="text-xl font-bold mb-4 text-gray-800">{program.title}</h3>
+            <p className="text-gray-600 mb-6 line-clamp-3 flex-grow leading-relaxed">
+              {program.shortDescription}
+            </p>
+            <div className="mt-auto">
+              <Link 
+                to={`/tracks/${program.id}`} 
+                className="text-primary hover:text-primary/80 font-medium inline-flex items-center gap-2 transition-colors"
+              >
+                <span>تفاصيل البرنامج</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="rtl:rotate-180">
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
               </Link>
             </div>
           </div>
