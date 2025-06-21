@@ -186,9 +186,9 @@ const AdminDashboard = () => {
 
         <Dialog open={isReceiptDialogOpen} onOpenChange={setIsReceiptDialogOpen}>
           <DialogContent className="sm:max-w-[425px]" dir="rtl">
-            <DialogHeader className="text-right">
-              <DialogTitle>عرض إيصال الدفع</DialogTitle>
-              <DialogDescription>
+            <DialogHeader>
+              <DialogTitle className="text-right">عرض إيصال الدفع</DialogTitle>
+              <DialogDescription className="text-right">
                 تفاصيل إيصال الدفع. يمكنك تحميل نسخة من الإيصال.
               </DialogDescription>
             </DialogHeader>
@@ -199,7 +199,7 @@ const AdminDashboard = () => {
                 <p>لا يمكن عرض الإيصال.</p>
               )}
             </div>
-            <DialogFooter className="justify-center gap-2">
+            <DialogFooter style={{ display: 'flex', justifyContent: 'center', width: '100%', gap: '1rem' }}>
               {selectedReceiptUrl && (
                 <Button asChild variant="default">
                   <a href={selectedReceiptUrl} download={`receipt-${Date.now()}.png`}>تحميل الإيصال</a>
@@ -216,13 +216,13 @@ const AdminDashboard = () => {
 
         <Dialog open={isConfirmPaymentDialogOpen} onOpenChange={setIsConfirmPaymentDialogOpen}>
           <DialogContent className="sm:max-w-[425px]" dir="rtl">
-            <DialogHeader className="text-right">
-              <DialogTitle>تأكيد عملية الدفع</DialogTitle>
-              <DialogDescription>
+            <DialogHeader>
+              <DialogTitle className="text-right">تأكيد عملية الدفع</DialogTitle>
+              <DialogDescription className="text-right">
                 هل أنت متأكد من رغبتك في تأكيد هذا الدفع؟ لا يمكن التراجع عن هذا الإجراء.
               </DialogDescription>
             </DialogHeader>
-            <DialogFooter className="justify-center gap-2 pt-4">
+            <DialogFooter style={{ display: 'flex', justifyContent: 'center', width: '100%', gap: '1rem', paddingTop: '1rem' }}>
               <Button variant="default" onClick={() => {
                 // TODO: Implement actual payment confirmation logic here (e.g., API call)
                 console.log(`Payment confirmed for ID: ${paymentToConfirmId}`);
