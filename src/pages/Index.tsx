@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import axios from 'axios';
 import { API_BASE_URL } from '@/services/config';
-import { Track } from '@/services/tracks';
+import { Track, TrackType } from '@/services/tracks';
 
 const Index = () => {
   return <PageTransition>
@@ -81,7 +81,7 @@ const AcademicPrograms = ({ isInView }: { isInView: boolean }) => {
       setIsLoading(true);
       setError(null); // Reset error state before new fetch
       try {
-        const response = await axios.get<Track[]>(`${API_BASE_URL}/api/Tracks?tracktype=0`);
+        const response = await axios.get<Track[]>(`${API_BASE_URL}/api/Tracks?tracktype=1`); 
         setTracks(response.data);
         console.log('Academic tracks data (direct fetch):', response.data);
       } catch (err) {
@@ -113,7 +113,7 @@ const ProfessionalPrograms = ({ isInView }: { isInView: boolean }) => {
       setIsLoading(true);
       setError(null); // Reset error state before new fetch
       try {
-        const response = await axios.get<Track[]>(`${API_BASE_URL}/api/Tracks?tracktype=1`);
+        const response = await axios.get<Track[]>(`${API_BASE_URL}/api/Tracks?tracktype=2`); // Changed from 1 to 2 for professional
         setTracks(response.data);
         console.log('Professional tracks data (direct fetch):', response.data);
       } catch (err) {
@@ -137,23 +137,33 @@ const ProfessionalPrograms = ({ isInView }: { isInView: boolean }) => {
 const ProgramsTabsSection = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
+  const [activeTab, setActiveTab] = useState<TrackType>(1); // 1 for academic, 2 for professional
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(Number(value) as TrackType);
+  };
 
   return (
     <section ref={ref} className="py-16 bg-gray-50">
       <div className="container-content">
         <h2 className="text-3xl font-bold text-[#002b4e] text-center mb-8">البرامج</h2>
         
-        <Tabs defaultValue="academic" className="w-full">
+        <Tabs 
+          defaultValue="1" 
+          className="w-full" 
+          onValueChange={handleTabChange}
+          value={activeTab.toString()}
+        >
           <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8 justify-end" dir="rtl">
-            <TabsTrigger value="academic">البرامج الأكاديمية</TabsTrigger>
-            <TabsTrigger value="professional">البرامج المهنية</TabsTrigger>
+            <TabsTrigger value="1">البرامج الأكاديمية</TabsTrigger>
+            <TabsTrigger value="2">البرامج المهنية</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="academic">
+          <TabsContent value="1">
             <AcademicPrograms isInView={isInView} />
           </TabsContent>
 
-          <TabsContent value="professional">
+          <TabsContent value="2">
             <ProfessionalPrograms isInView={isInView} />
           </TabsContent>
         </Tabs>
