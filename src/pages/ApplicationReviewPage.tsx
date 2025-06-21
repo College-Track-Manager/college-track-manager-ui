@@ -8,6 +8,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver'; // For triggering download
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 // Mock data structure for an application - replace with actual data fetching
 interface ApplicationData {
@@ -54,7 +63,9 @@ const ApplicationReviewPage = () => {
   };
   const [applicationData, setApplicationData] = React.useState<ApplicationData | null>(mockApplication);
   const [isLoading, setIsLoading] = React.useState(false); // Set to true when fetching data
-  const [error, setError] = React.useState<string | null>(null);
+    const [error, setError] = React.useState<string | null>(null);
+  const [isAlertDialogOpen, setIsAlertDialogOpen] = React.useState(false);
+  const [alertDialogMessage, setAlertDialogMessage] = React.useState('');
 
   // Placeholder for actual data fetching logic
   // useEffect(() => {
@@ -90,13 +101,15 @@ const ApplicationReviewPage = () => {
   const handleApprove = () => {
     // TODO: Implement approval logic
     console.log('Application approved:', applicationId);
-    alert('تمت الموافقة على الطلب');
+    setAlertDialogMessage('تمت الموافقة على الطلب');
+    setIsAlertDialogOpen(true);
   };
 
   const handleDisapprove = () => {
     // TODO: Implement disapproval logic
     console.log('Application disapproved:', applicationId);
-    alert('تم رفض الطلب');
+    setAlertDialogMessage('تم رفض الطلب');
+    setIsAlertDialogOpen(true);
   };
 
   const handleDownloadAllDocuments = async () => {
@@ -262,6 +275,19 @@ const ApplicationReviewPage = () => {
             )}
           </CardContent>
         </Card>
+              <AlertDialog open={isAlertDialogOpen} onOpenChange={setIsAlertDialogOpen} dir="rtl">
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-right">حالة الطلب</AlertDialogTitle>
+              <AlertDialogDescription className="text-right">
+                {alertDialogMessage}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+              <AlertDialogAction onClick={() => setIsAlertDialogOpen(false)}>موافق</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </PageTransition>
   );
