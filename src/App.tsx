@@ -26,6 +26,7 @@ import ProgramRegistrationSuccess from "./pages/ProgramRegistrationSuccess";
 import ForgotPassword from "./pages/ForgotPassword";
 import StatusMessage from "./pages/StatusMessage";
 import ResetPassword from "./pages/ResetPassword";
+import Unauthorized from "./pages/Unauthorized";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -63,6 +64,7 @@ const App = () => (
                   <Route path="/program-registration-success" element={<ProgramRegistrationSuccess />} />
                   <Route path="/status" element={<StatusMessage />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/unauthorized" element={<Unauthorized />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </AnimatePresence>
