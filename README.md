@@ -29,9 +29,7 @@ npm install jszip
 npm install file-saver
 ```
 
-#### For Windows Users
-
-1. **Clean up and reinstall dependencies**
+For Windows Users
 ```sh
 # Remove lock file and node_modules
 rm -rf node_modules package-lock.json
