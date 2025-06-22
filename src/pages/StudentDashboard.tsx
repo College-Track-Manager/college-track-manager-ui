@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { BookIcon, GraduationCapIcon } from "lucide-react";
 import { useAuth } from '@/context/AuthContext';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { fetchStudentProfile, StudentProfile } from '@/services/students';
 
 const StudentDashboard = () => {
@@ -65,14 +66,33 @@ const StudentDashboard = () => {
   if (error) {
     return (
       <PageTransition>
-        <div className="flex justify-center items-center h-96">
-          <span className="text-red-500">{error}</span>
+        <div className="text-red-500 text-center p-4">{error}</div>
+      </PageTransition>
+    );
+  }
+  
+  // Show empty state if there are no registrations
+  if (!profile || !profile.track?.id) {
+    return (
+      <PageTransition>
+        <div className="min-h-[calc(100vh-200px)] flex items-center justify-center px-4">
+          <div className="bg-white p-8 rounded-lg shadow-sm w-full max-w-2xl text-center">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-4">
+              <GraduationCapIcon className="h-8 w-8 text-blue-600" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">لا توجد تسجيلات</h3>
+            <p className="text-gray-500 mb-6">لم تقم بالتسجيل في أي برنامج دراسي بعد.</p>
+            <Link
+              to="/tracks"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              تصفح البرامج المتاحة
+            </Link>
+          </div>
         </div>
       </PageTransition>
     );
   }
-
-  if (!profile) return null;
 
   return (
     <PageTransition>
