@@ -75,7 +75,7 @@ const StudentDashboard = () => {
   if (!profile || !profile.track?.id) {
     return (
       <PageTransition>
-        <div className="min-h-[calc(100vh-200px)] flex items-center justify-center px-4">
+        <div className="min-h-[62vh] flex items-center justify-center px-4 py-16">
           <div className="bg-white p-8 rounded-lg shadow-sm w-full max-w-2xl text-center">
             <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-4">
               <GraduationCapIcon className="h-8 w-8 text-blue-600" />
@@ -84,7 +84,7 @@ const StudentDashboard = () => {
             <p className="text-gray-500 mb-6">لم تقم بالتسجيل في أي برنامج دراسي بعد.</p>
             <Link
               to="/tracks"
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
             >
               تصفح البرامج المتاحة
             </Link>
