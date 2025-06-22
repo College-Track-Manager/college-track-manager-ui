@@ -100,9 +100,11 @@ const StudentDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 items-stretch">
           <Card className="md:col-span-1 h-full flex flex-col">
             <CardHeader className="flex-1 flex flex-col justify-center items-center gap-4">
-              <Avatar className="h-16 w-16">
-                <AvatarImage src={user?.avatar || '/placeholder.svg'} alt={profile.fullName} />
-                <AvatarFallback>{profile.fullName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+              <Avatar className="h-16 w-16 bg-primary/10">
+                <AvatarImage src={user?.avatar} alt={profile.fullName} />
+                <AvatarFallback className="bg-transparent">
+                  <GraduationCapIcon className="h-8 w-8 text-primary" />
+                </AvatarFallback>
               </Avatar>
               <div>
                 <CardTitle className="text-2xl">{profile.fullName}</CardTitle>
