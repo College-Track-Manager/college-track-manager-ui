@@ -145,7 +145,7 @@ const StudentDashboard = () => {
                     <CardContent className="text-right">
                       <div className="w-full flex flex-col items-end gap-2 text-right">
                         <div className="text-sm">
-                          <span>رمز المقرر: {course.courseCode}</span>
+                          <span>{course.courseCode}: رمز المقرر</span>
                           <BookIcon className="h-4 w-4 text-muted-foreground inline-block mr-2" />
                         </div>
                         <div className="text-sm">
