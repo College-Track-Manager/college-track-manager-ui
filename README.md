@@ -22,6 +22,26 @@ cd college-track-manager
 ```sh
 npm install
 ```
+ If you had any troubles with the dependencies, try to install them manually:
+```sh
+npm install jwt-decode
+npm install jszip
+npm install file-saver
+```
+
+#### For Windows Users
+
+1. **Clean up and reinstall dependencies**
+```sh
+# Remove lock file and node_modules
+rm -rf node_modules package-lock.json
+
+# Reinstall all dependencies
+npm install
+
+# Install Rollup native dependency for Windows
+npm install rollup @rollup/rollup-win32-x64-msvc --save-dev
+```
 
 3. **Set up environment variables**
 ```sh
