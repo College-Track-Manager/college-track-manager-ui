@@ -19,7 +19,16 @@ export function RegistrationFields({ control }: RegistrationFieldsProps) {
             <FormItem>
               <FormLabel className="block text-right mb-1 px-0">الاسم الأول</FormLabel>
               <FormControl>
-                <Input className="border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" placeholder="الاسم الأول" {...field} />
+                <Input 
+                  className="border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" 
+                  placeholder="الاسم الأول" 
+                  maxLength={50}
+                  {...field} 
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^\u0600-\u06FFa-zA-Z\s]/g, '').slice(0, 50);
+                    field.onChange(value);
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -34,7 +43,16 @@ export function RegistrationFields({ control }: RegistrationFieldsProps) {
             <FormItem>
               <FormLabel className="block text-right mb-1 px-0">الاسم الأخير</FormLabel>
               <FormControl>
-                <Input className="border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" placeholder="الاسم الأخير" {...field} />
+                <Input 
+                  className="border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" 
+                  placeholder="الاسم الأخير" 
+                  maxLength={50}
+                  {...field}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^\u0600-\u06FFa-zA-Z\s]/g, '').slice(0, 50);
+                    field.onChange(value);
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -50,7 +68,19 @@ export function RegistrationFields({ control }: RegistrationFieldsProps) {
             <FormItem>
               <FormLabel className="block text-right mb-1 px-0">البريد الإلكتروني</FormLabel>
               <FormControl>
-                <Input className="border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" type="email" placeholder="your@email.com" {...field} />
+                <Input 
+                  className="border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" 
+                  type="email" 
+                  placeholder="your@email.com" 
+                  dir="ltr"
+                  maxLength={100}
+                  {...field} 
+                  onChange={(e) => {
+                    // Basic email format validation while typing
+                    const value = e.target.value.trim();
+                    field.onChange(value);
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -91,7 +121,15 @@ export function RegistrationFields({ control }: RegistrationFieldsProps) {
             <FormItem>
               <FormLabel className="block text-right mb-1 px-0">العنوان</FormLabel>
               <FormControl>
-                <Input className="border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" placeholder="عنوانك" {...field} />
+                <Input
+                  className="border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                  placeholder="عنوانك"
+                  maxLength={100}
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(e.target.value.slice(0, 100));
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

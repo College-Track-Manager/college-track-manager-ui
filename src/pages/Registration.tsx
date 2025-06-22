@@ -18,7 +18,14 @@ const registrationSchema = z.object({
     .min(2, { message: 'الاسم الأول مطلوب' })
     .regex(/^[\u0600-\u06FFa-zA-Z\s]+$/, { message: 'الاسم الأول يجب أن يحتوي على حروف فقط' }),
   lastName: z.string().min(2, { message: 'الاسم الأخير مطلوب' }),
-  email: z.string().email({ message: 'عنوان البريد الإلكتروني غير صالح' }),
+  email: z.string()
+    .min(1, { message: 'البريد الإلكتروني مطلوب' })
+    .max(100, { message: 'يجب ألا يتجاوز البريد الإلكتروني 100 حرف' })
+    .email({ message: 'عنوان البريد الإلكتروني غير صالح' })
+    .regex(
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/, 
+      { message: 'صيغة البريد الإلكتروني غير صالحة' }
+    ),
   phone: z.string()
     .length(11, { message: 'رقم الهاتف يجب أن يتكون من 11 رقم' })
     .regex(/^[0-9]+$/, { message: 'رقم الهاتف يجب أن يحتوي على أرقام فقط' }),
