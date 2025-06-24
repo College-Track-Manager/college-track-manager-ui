@@ -132,7 +132,7 @@ const StudentDashboard = () => {
 
         <Tabs defaultValue="courses">
           <TabsList className="mb-6">
-            <TabsTrigger value="courses">دوراتي</TabsTrigger>
+            <TabsTrigger value="courses">المواد</TabsTrigger>
           </TabsList>
 
           <TabsContent value="courses">

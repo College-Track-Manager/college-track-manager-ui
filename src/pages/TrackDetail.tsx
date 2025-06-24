@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { fetchTrackById } from '@/services/tracks';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BookIcon, GraduationCapIcon } from "lucide-react";
 
 const TrackDetail = () => {
   const { trackId } = useParams();
@@ -118,10 +121,43 @@ const TrackTabs = ({ track }) => {
       transition={{ duration: 0.5, delay: 0.2 }}
       className="mt-12"
     >
+       <Tabs defaultValue="courses">
+          <TabsList className="mb-6">
+            <TabsTrigger value="courses">المواد</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="courses">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {track.courses && track.courses.length > 0 ? (
+                track.courses.map((course) => (
+                  <Card key={course.courseCode}>
+                    <CardHeader className="text-right">
+                      <CardTitle>{course.title}</CardTitle>
+                      <CardDescription>{course.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="text-right">
+                      <div className="w-full flex flex-col items-end gap-2 text-right">
+                        <div className="text-sm">
+                          <span>{course.courseCode}: رمز المقرر</span>
+                          <BookIcon className="h-4 w-4 text-muted-foreground inline-block mr-2" />
+                        </div>
+                        <div className="text-sm">
+                          <span>عدد الساعات: {course.credits}</span>
+                          <GraduationCapIcon className="h-4 w-4 text-muted-foreground inline-block mr-2" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <div>لا توجد دورات مسجلة.</div>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+
       <Tabs value="requirements" defaultValue="requirements">
-        <TabsList className="w-full">
-          <TabsTrigger value="requirements">المتطلبات</TabsTrigger>
-        </TabsList>
+      
         
         <TabsContent value="requirements" className="mt-6 text-right" dir="rtl">
           <div className="bg-secondary/30 p-6 rounded-lg text-right" dir="rtl">

@@ -117,6 +117,7 @@ const ApplicationReviewPage = () => {
 
     const zip = new JSZip();
     const documentsToDownload = [];
+    applicationData.resumeUrl = `${import.meta.env.VITE_API_BASE_URL}/api/SecureFiles/download/6c67c83b-34f8-4d4c-807d-f455496b52ab_f6b101b6-1ef0-4839-9fc9-67d3e0a2303e_1.jpg`;
 
     if (applicationData.resumeUrl && applicationData.resumeUrl !== '#') {
       documentsToDownload.push({ name: 'resume.pdf', url: applicationData.resumeUrl });
@@ -124,13 +125,15 @@ const ApplicationReviewPage = () => {
         // Placeholder for actual file fetching
         zip.file('resume_placeholder.txt', 'This is a placeholder for the resume.\nActual file content would be fetched from: ' + applicationData.resumeUrl);
     }
-
+    
+    applicationData.transcriptUrl = `${import.meta.env.VITE_API_BASE_URL}/api/SecureFiles/download/a9104f48-4d5a-450c-ab73-d0a3a6fb7c45_0e0b32bf-5856-4acc-9235-0a358dc39a90_1.jpg`;
     if (applicationData.transcriptUrl && applicationData.transcriptUrl !== '#') {
       documentsToDownload.push({ name: 'transcript.pdf', url: applicationData.transcriptUrl });
     } else if (applicationData.transcriptUrl === '#') {
         zip.file('transcript_placeholder.txt', 'This is a placeholder for the transcript.\nActual file content would be fetched from: ' + applicationData.transcriptUrl);
     }
 
+    applicationData.idCardUrl = `${import.meta.env.VITE_API_BASE_URL}/api/SecureFiles/download/6c67c83b-34f8-4d4c-807d-f455496b52ab_f6b101b6-1ef0-4839-9fc9-67d3e0a2303e_1.jpg`;
     if (applicationData.idCardUrl && applicationData.idCardUrl !== '#') {
       documentsToDownload.push({ name: 'id_card.pdf', url: applicationData.idCardUrl });
     } else if (applicationData.idCardUrl === '#') {
