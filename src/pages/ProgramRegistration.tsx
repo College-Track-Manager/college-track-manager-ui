@@ -178,12 +178,22 @@ const ProgramRegistration = () => {
         description: "تم تقديم طلب البرنامج بنجاح وهو قيد المراجعة.",
       });
       navigate('/program-registration-success');
-    } catch (error) {
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء تقديم طلب البرنامج",
-        variant: "destructive",
-      });
+    } catch (error: any) {
+      // Check if this is a duplicate registration error
+      const errorMessage = error.response?.data?.message || '';
+      
+      if (errorMessage.includes('You have already registered for a track this academic year')) {
+        toast({
+          description: "لقد قمت بالتسجيل في مسار آخر لهذا العام الدراسي مسبقاً",
+          variant: "destructive",
+        });
+      } else {
+        // Show generic error message for other errors
+        toast({
+          description: errorMessage || "حدث خطأ أثناء تقديم طلب البرنامج",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
