@@ -30,35 +30,37 @@ export default function ResetPassword() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPasswordError, setShowPasswordError] = useState(false);
+  const [showMatchError, setShowMatchError] = useState(false);
+
+  // Real-time validation effects
+  useEffect(() => {
+    if (newPassword.length > 0 && newPassword.length < 6) {
+      setShowPasswordError(true);
+    } else {
+      setShowPasswordError(false);
+    }
+  }, [newPassword]);
+
+  useEffect(() => {
+    if (confirmPassword.length > 0 && newPassword !== confirmPassword) {
+      setShowMatchError(true);
+    } else {
+      setShowMatchError(false);
+    }
+  }, [newPassword, confirmPassword]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Final validation before submission
     if (!newPassword || newPassword.length < 6) {
-      toast.custom((t) => (
-        <div
-          className="bg-red-500 text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 animate-fade-in"
-          style={{ minWidth: 320 }}
-        >
-          <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#ef4444"/><path d="M15 9l-6 6M9 9l6 6" stroke="#fff" strokeWidth="2" strokeLinecap="round"/></svg>
-          <span className="text-lg font-medium">
-            كلمة المرور ضعيفة. يجب أن تتكون كلمة المرور الجديدة من 6 أحرف على الأقل.
-          </span>
-        </div>
-      ), { position: "top-center", duration: 5000 });
+      setShowPasswordError(true);
       return;
     }
+    
     if (newPassword !== confirmPassword) {
-      toast.custom((t) => (
-        <div
-          className="bg-red-500 text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 animate-fade-in"
-          style={{ minWidth: 320 }}
-        >
-          <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#ef4444"/><path d="M15 9l-6 6M9 9l6 6" stroke="#fff" strokeWidth="2" strokeLinecap="round"/></svg>
-          <span className="text-lg font-medium">
-            كلمتا المرور غير متطابقتين.
-          </span>
-        </div>
-      ), { position: "top-center", duration: 5000 });
+      setShowMatchError(true);
       return;
     }
     setIsSubmitting(true);
@@ -119,22 +121,44 @@ export default function ResetPassword() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <Input
-                type="password"
-                required
-                placeholder="كلمة المرور الجديدة"
-                className="w-full"
-                value={newPassword}
-                onChange={e => setNewPassword(e.target.value)}
-              />
-              <Input
-                type="password"
-                required
-                placeholder="تأكيد كلمة المرور الجديدة"
-                className="w-full"
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
-              />
+              <div className="space-y-1">
+                <Input
+                  type="password"
+                  required
+                  placeholder="كلمة المرور الجديدة"
+                  className={`w-full ${showPasswordError ? 'border-red-500' : ''}`}
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
+                />
+                {showPasswordError && (
+                  <p className="text-sm text-red-500 flex items-center gap-1">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" className="flex-shrink-0">
+                      <circle cx="12" cy="12" r="12" fill="#ef4444"/>
+                      <path d="M15 9l-6 6M9 9l6 6" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                    يجب أن تتكون كلمة المرور من 6 أحرف على الأقل
+                  </p>
+                )}
+              </div>
+              <div className="space-y-1">
+                <Input
+                  type="password"
+                  required
+                  placeholder="تأكيد كلمة المرور الجديدة"
+                  className={`w-full ${showMatchError ? 'border-red-500' : ''}`}
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                />
+                {showMatchError && (
+                  <p className="text-sm text-red-500 flex items-center gap-1">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" className="flex-shrink-0">
+                      <circle cx="12" cy="12" r="12" fill="#ef4444"/>
+                      <path d="M15 9l-6 6M9 9l6 6" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                    كلمتا المرور غير متطابقتين
+                  </p>
+                )}
+              </div>
               <Button type="submit" className="w-full bg-primary text-white mt-2" disabled={isSubmitting}>
                 {isSubmitting ? "جاري التغيير..." : "تغيير كلمة المرور"}
               </Button>
