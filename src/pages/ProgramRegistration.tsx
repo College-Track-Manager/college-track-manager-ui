@@ -164,7 +164,7 @@ const ProgramRegistration = () => {
         email: 'test@example.com',
         studyType: data.studyType,
         trackType: data.trackType,
-        trackDegree: data.educationLevel,
+        trackDegree: (data.educationLevel === 'diploma' ? '1' : data.educationLevel === 'master' ? '2' : '3'),
         track: data.track,
         education: data.education,
         statement: data.statement,
@@ -263,7 +263,7 @@ const ProgramRegistration = () => {
                           <SelectValue placeholder="اختر المرحلة الدراسية" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="bachelor" className="text-right" dir="rtl">دبلوما</SelectItem>
+                          <SelectItem value="diploma" className="text-right" dir="rtl">دبلوما</SelectItem>
                           <SelectItem value="master" className="text-right" dir="rtl">ماجستير</SelectItem>
                           <SelectItem value="phd" className="text-right" dir="rtl">دكتوراه</SelectItem>
                         </SelectContent>
