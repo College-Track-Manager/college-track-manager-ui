@@ -1,15 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { CheckCircle } from 'lucide-react';
 import { RegistrationFields } from './RegistrationFields';
 import PageTransition from '@/components/ui/PageTransition';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form} from '@/components/ui/form';
 import { useNavigate } from 'react-router-dom';
 import { registrationsApi } from '@/services/registrations';
 
@@ -57,8 +54,6 @@ const Registration = () => {
       confirmPassword: '',
     },
   });
-
-
 
   const onSubmit = async (data: RegistrationFormValues) => {
     console.log("onSubmit called!", data); // Debug log
