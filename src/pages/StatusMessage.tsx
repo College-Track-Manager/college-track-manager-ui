@@ -6,7 +6,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 type StatusType = "success" | "error" | "info" | "warning";
 
 const icons = {
-  success: <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />,
+  success: <CheckCircle className="w-12 h-12 text-[#1992c8] mx-auto mb-4" />,
   error: <XCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />,
   info: <Info className="w-12 h-12 text-blue-500 mx-auto mb-4" />,
   warning: <Info className="w-12 h-12 text-yellow-500 mx-auto mb-4" />,
