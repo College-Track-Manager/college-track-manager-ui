@@ -185,6 +185,19 @@ const TrackSidebar = ({ track }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
   
+  const handleBrochureDownload = () => {
+    // Create a temporary link element
+    const link = document.createElement('a');
+    // Set the path to the PDF file
+    link.href = '/brochures/الكتيب التعريفي.pdf';
+    // Set the download attribute with the desired filename
+    link.download = 'الكتيب التعريفي.pdf';
+    // Append to body, click and remove
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
   return (
     <motion.div
       ref={ref}
@@ -229,7 +242,11 @@ const TrackSidebar = ({ track }) => {
             </Link>
           )}
         </Button>
-        <Button variant="outline" className="w-full mt-3 flex flex-row-reverse items-center justify-center">
+        <Button 
+          variant="outline" 
+          className="w-full mt-3 flex flex-row-reverse items-center justify-center"
+          onClick={handleBrochureDownload}
+        >
           <ArrowLeft size={16} className="ml-1" /> تحميل الكتيب التعريفي
         </Button>
       </div>
