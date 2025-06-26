@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
+import { ArrowLeft } from 'lucide-react';
 import PageTransition from '@/components/ui/PageTransition';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -225,12 +226,9 @@ const ProgramsContent = ({ tracks, isLoading, isInView }: ProgramsContentProps) 
             <div className="mt-auto">
               <Link 
                 to={`/tracks/${program.id}`} 
-                className="text-primary hover:text-primary/80 font-medium inline-flex items-center gap-2 transition-colors"
+                className="inline-flex items-center justify-center w-full py-2.5 bg-secondary hover:bg-secondary/80 rounded-md text-sm font-medium transition-colors"
               >
-                <span>تفاصيل البرنامج</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="rtl:rotate-180">
-                  <path d="M15 18l-6-6 6-6" />
-                </svg>
+                عرض التفاصيل <ArrowLeft size={16} className="mr-1" />
               </Link>
             </div>
           </div>
