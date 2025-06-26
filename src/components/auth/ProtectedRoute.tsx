@@ -12,24 +12,17 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children, 
   requiredRole = null 
 }) => {
-  // Debug logging
-  console.log('🔍 ProtectedRoute rendering...');
-  console.log('🔑 isAuthenticated:', useAuth().isAuthenticated);
-  console.log('🔑 Token exists:', !!getToken());
-  console.log('🔑 Token expired:', getToken() ? isTokenExpired(getToken()!) : 'No token');
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, user, hasRequiredRole } = useAuth();
+  const { isAuthenticated, hasRequiredRole } = useAuth();
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
   
   const checkAuth = useCallback(() => {
-    console.log('🔒 Checking authentication...');
     const token = getToken();
     
     // Case 1: No token at all
     if (!token) {
       console.log('❌ No token found');
-      removeToken();
       setIsAuthorized(false);
       return false;
     }
@@ -42,15 +35,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       return false;
     }
     
-    // Case 3: Token is valid but user is not authenticated in context
-    if (!isAuthenticated) {
-      console.log('🔐 Token valid but not authenticated in context');
-      removeToken();
-      setIsAuthorized(false);
-      return false;
-    }
-    
-    // Case 4: Role-based access control
+    // Case 3: Role-based access control
     if (requiredRole !== null && !hasRequiredRole(requiredRole)) {
       console.log('🚫 Insufficient permissions');
       setIsAuthorized(false);
@@ -61,18 +46,27 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     console.log('✅ Authorized');
     setIsAuthorized(true);
     return true;
-  }, [isAuthenticated, requiredRole, hasRequiredRole]);
+  }, [requiredRole, hasRequiredRole]);
   
   // Initial check on mount and when location changes
   useEffect(() => {
+    const token = getToken();
+    
+    // If we have a valid token, trust it even if context isn't loaded yet
+    if (token && !isTokenExpired(token) && isAuthorized === null) {
+      console.log('🔑 Valid token found, trusting it');
+      setIsAuthorized(true);
+      return;
+    }
+    
+    // Otherwise, perform full auth check
     checkAuth();
     
     // Set up interval to check auth status periodically
     const interval = setInterval(checkAuth, 30000); // Check every 30 seconds
     
-    // Clean up interval on unmount
     return () => clearInterval(interval);
-  }, [checkAuth, location.pathname]);
+  }, [checkAuth, location.pathname, isAuthorized]);
   
   // Handle redirects based on auth status
   useEffect(() => {
@@ -103,7 +97,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
   
   // If we get here, the user is authorized to see the page
-  console.log('✅ Rendering protected content');
   return children;
 };
 
