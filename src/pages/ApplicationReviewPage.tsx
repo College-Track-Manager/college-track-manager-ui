@@ -17,74 +17,89 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { registrationsApi } from '@/services/registrations'
+import { useEffect, useState } from 'react';
+import { ApplicationData } from '@/data/ApplicationData';
+import { useNavigate } from 'react-router-dom';
 
 // Mock data structure for an application - replace with actual data fetching
-interface ApplicationData {
-  id: string;
-  name: string;
-  email: string;
-  trackType: 'academic' | 'professional';
-  track: string;
-  educationLevel: string;
-  studyType: 'online' | 'offline';
-  education: string;
-  statement?: string;
-  resumeUrl?: string; // URL to download resume
-  transcriptUrl?: string; // URL to download transcript
-  idCardUrl?: string; // URL to download ID card
-  submissionDate: string;
-}
+
 
 const ApplicationReviewPage = () => {
   const location = useLocation();
   const { isReadOnlyView, status: applicationFinalStatus, applicantName: routeApplicantName, trackName: routeTrackName } = (location.state as { isReadOnlyView?: boolean; status?: string; applicantName?: string; trackName?: string; }) || {};
   const { applicationId } = useParams<{ applicationId: string }>();
+  const [mockApplication, setPendingApplications] = useState<ApplicationData>();
 
     // Use route params for initial display if available, then fetch full data
   const initialName = routeApplicantName || 'جاري التحميل...';
   const initialTrack = routeTrackName || 'جاري التحميل...';
+  const navigate = useNavigate();
+  
+    // useEffect(() => {
+    //   // Fetch all data when component mountsss
+    //   const fetchData = async () => {
+    //     try {
+    //       const [mockApplication] = await Promise.all([
+    //         registrationsApi.GetRegistrationById(applicationId)
+    //       ]);
+          
+    //       setPendingApplications(mockApplication);
+        
+                 
+    //     } catch (err) {
+    //       console.error("Error fetching data:", err);
+    //       // Handle error appropriately, e.g., show a notification
+    //     }
+    //   };
+      
+    //   fetchData();
+    // }, []);
 
   // TODO: Fetch application data based on applicationId
   // For now, using mock data that incorporates initial route params
-  const mockApplication: ApplicationData = {
-    id: applicationId || '1',
-    name: initialName,
-    email: 'ahmed.alghamdi@example.com', // This will be overwritten by actual fetch
-    trackType: 'academic', // This will be overwritten
-    track: initialTrack,
-    educationLevel: 'ماجستير',
-    studyType: 'online',
-    education: 'بكالوريوس هندسة برمجيات - جامعة الملك سعود (2020)',
-    statement: 'أسعى لتطوير مهاراتي في مجال الذكاء الاصطناعي وتطبيقاته في تحليل البيانات الضخمة. لدي شغف كبير بالبحث العلمي وأطمح للمساهمة في تطوير حلول تقنية مبتكرة تخدم المجتمع. أتمنى أن تتاح لي الفرصة للانضمام إلى هذا البرنامج المتميز.',
-    resumeUrl: '#',
-    transcriptUrl: '#',
-    idCardUrl: '#',
-    submissionDate: '2023-09-15',
-  };
+  // const mockApplication: ApplicationData = {
+  //   id: applicationId || '1',
+  //   name: initialName,
+  //   email: 'ahmed.alghamdi@example.com', // This will be overwritten by actual fetch
+  //   trackType: 'academic', // This will be overwritten
+  //   track: initialTrack,
+  //   educationLevel: 'ماجستير',
+  //   studyType: 'online',
+  //   education: 'بكالوريوس هندسة برمجيات - جامعة الملك سعود (2020)',
+  //   statement: 'أسعى لتطوير مهاراتي في مجال الذكاء الاصطناعي وتطبيقاته في تحليل البيانات الضخمة. لدي شغف كبير بالبحث العلمي وأطمح للمساهمة في تطوير حلول تقنية مبتكرة تخدم المجتمع. أتمنى أن تتاح لي الفرصة للانضمام إلى هذا البرنامج المتميز.',
+  //   resumeUrl: '#',
+  //   transcriptUrl: '#',
+  //   idCardUrl: '#',
+  //   submissionDate: '2023-09-15',
+  // };
   const [applicationData, setApplicationData] = React.useState<ApplicationData | null>(mockApplication);
   const [isLoading, setIsLoading] = React.useState(false); // Set to true when fetching data
     const [error, setError] = React.useState<string | null>(null);
   const [isAlertDialogOpen, setIsAlertDialogOpen] = React.useState(false);
   const [alertDialogMessage, setAlertDialogMessage] = React.useState('');
+  const [rejectionReason, setRejectionReason] = useState("");
+  // Reading the value:
+const currentValue = rejectionReason; // Always up-to-date
 
   // Placeholder for actual data fetching logic
-  // useEffect(() => {
-  //   const fetchApplication = async () => {
-  //     setIsLoading(true);
-  //     try {
-  //       // const data = await fetchActualApplicationData(applicationId);
-  //       // setApplicationData(data);
-  //       setError(null);
-  //     } catch (err) {
-  //       setError('Failed to load application data.');
-  //       setApplicationData(null);
-  //     }
-  //     setIsLoading(false);
-  //   };
-  //   if (applicationId) {
-  //     fetchApplication();
-  //   }
-  // }, [applicationId]);
+  useEffect(() => {
+    const fetchApplication = async () => {
+      setIsLoading(true);
+      try {
+        const data = await registrationsApi.GetRegistrationById(applicationId);
+        setApplicationData(data);
+        setError(null);
+      } catch (err) {
+        setError('Failed to load application data.');
+        setApplicationData(null);
+      }
+      setIsLoading(false);
+    };
+    if (applicationId) {
+      fetchApplication();
+    }
+  }, [applicationId]);
 
   if (isLoading) {
     return <div className="text-center p-8">جاري تحميل بيانات الطلب...</div>;
@@ -101,6 +116,7 @@ const ApplicationReviewPage = () => {
   const handleApprove = () => {
     // TODO: Implement approval logic
     console.log('Application approved:', applicationId);
+    //const data =  registrationsApi.ApproveRegistration(applicationId,1,"");
     setAlertDialogMessage('تمت الموافقة على الطلب');
     setIsAlertDialogOpen(true);
   };
@@ -111,6 +127,21 @@ const ApplicationReviewPage = () => {
     setAlertDialogMessage('تم رفض الطلب');
     setIsAlertDialogOpen(true);
   };
+
+  const ApproveRegistration = async () =>{
+
+      const data =  registrationsApi.ApproveRegistration(applicationId,1,"");
+      setIsAlertDialogOpen(false);
+       navigate(`/admin/dashboard`);
+  }
+
+    const RejectRegistration = async () =>{     
+      const data =  registrationsApi.ApproveRegistration(applicationId,2,rejectionReason);
+      setIsAlertDialogOpen(false);
+       // Redirect after success
+     
+      navigate(`/admin/dashboard`);
+  }
 
   const handleDownloadAllDocuments = async () => {
     if (!applicationData) return;
@@ -247,22 +278,16 @@ const ApplicationReviewPage = () => {
               )}
             </div>
 
-            {isReadOnlyView ? (
+            {isReadOnlyView ? (              
               <div className="pt-6 border-t mt-6">
                 <h4 className="font-semibold mb-2">حالة الطلب النهائية:</h4>
-                {applicationFinalStatus === 'approved' && (
+                {Number(applicationFinalStatus) === 1 && (
                   <p className="text-lg font-semibold text-green-600 p-3 bg-green-50 rounded-md border border-green-200">الطالب مقبول (Approved)</p>
                 )}
-                {applicationFinalStatus === 'disapproved' && (
+                {Number(applicationFinalStatus) === 2 && (
                   <p className="text-lg font-semibold text-red-600 p-3 bg-red-50 rounded-md border border-red-200">الطالب مرفوض (Disapproved)</p>
-                )}
-                {applicationFinalStatus === 'accepted' && ( // Assuming 'accepted' is similar to 'approved'
-                  <p className="text-lg font-semibold text-green-600 p-3 bg-green-50 rounded-md border border-green-200">الطالب مقبول (Approved)</p>
-                )}
-                {applicationFinalStatus === 'rejected' && ( // Assuming 'rejected' is similar to 'disapproved'
-                  <p className="text-lg font-semibold text-red-600 p-3 bg-red-50 rounded-md border border-red-200">الطالب مرفوض (Disapproved)</p>
-                )}
-                 {!(applicationFinalStatus === 'approved' || applicationFinalStatus === 'disapproved' || applicationFinalStatus === 'accepted' || applicationFinalStatus === 'rejected') && (
+                )}               
+                 {!(Number(applicationFinalStatus) === 1 || Number(applicationFinalStatus) === 2 || Number(applicationFinalStatus) === 1 || Number(applicationFinalStatus) === 2) && (
                   <p className="text-lg font-semibold text-gray-600 p-3 bg-gray-50 rounded-md border border-gray-200">حالة الطلب: {applicationFinalStatus || 'غير محددة'}</p>
                 )}
               </div>
@@ -276,21 +301,59 @@ const ApplicationReviewPage = () => {
                 </Button>
               </div>
             )}
+
+          
+
           </CardContent>
         </Card>
-              <AlertDialog open={isAlertDialogOpen} onOpenChange={setIsAlertDialogOpen} dir="rtl">
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle className="text-right">حالة الطلب</AlertDialogTitle>
-              <AlertDialogDescription className="text-right">
-                {alertDialogMessage}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-              <AlertDialogAction onClick={() => setIsAlertDialogOpen(false)}>موافق</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+              <AlertDialog open={isAlertDialogOpen} onOpenChange={setIsAlertDialogOpen} >
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle className="text-right">حالة الطلب</AlertDialogTitle>
+      <AlertDialogDescription className="text-right">
+        {alertDialogMessage === "تم رفض الطلب" ? (
+          <>
+            <div className="space-y-4 pt-4">
+              <h3 className="text-lg font-semibold border-b pb-2 mb-4">سبب الرفض</h3>
+              <div>
+                <Label htmlFor="rejectionReason" className="mb-2 block">سبب الرفض *</Label>
+                <Textarea
+                  id="rejectionReason"
+                  name="rejectionReason"
+                  defaultValue={applicationData.adminComments}
+                  rows={4}
+                  className="bg-gray-50"
+                  required
+                  onChange={(e) => setRejectionReason(applicationData.adminComments = e.target.value)}
+                />
+                <p className="text-sm text-red-500 mt-1">هذا الحقل مطلوب</p>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="p-4 bg-blue-50 text-blue-800 rounded-md">
+              <p>{alertDialogMessage}</p>
+            </div>
+          </>
+        )}
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+      <AlertDialogAction 
+        disabled={alertDialogMessage === "تم رفض الطلب" && !applicationData.adminComments}
+        className={
+          alertDialogMessage === "تم رفض الطلب" && !applicationData.adminComments
+            ? "opacity-50 cursor-not-allowed"
+            : ""
+        }
+        onClick={() => (alertDialogMessage === "تم رفض الطلب" ? RejectRegistration() : ApproveRegistration())}
+      >
+        موافق
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
       </div>
     </PageTransition>
   );

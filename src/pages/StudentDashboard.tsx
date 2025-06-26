@@ -126,6 +126,7 @@ const StudentDashboard = () => {
               <div><strong>درجة المسار:</strong> {getTrackDegreeString(profile.trackDegree)}</div>
               <div><strong>نوع الدراسة:</strong> {getStudyTypeString(profile.studyType)}</div>
               <div><strong>تاريخ التسجيل:</strong> {new Date(profile.registrationDate).toLocaleDateString('ar-EG')}</div>
+              <div><strong>حالة التسجيل</strong> {profile.statusDesctiption}</div>
             </CardContent>
           </Card>
         </div>

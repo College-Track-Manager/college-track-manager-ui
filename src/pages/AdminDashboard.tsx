@@ -20,28 +20,76 @@ import {
 import React from 'react'; // Added React for useState
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+
+import { registrationsApi } from '@/services/registrations'
+import { StudentRegistration } from '@/services/registrations';
 
 const AdminDashboard = () => {
   const [isReceiptDialogOpen, setIsReceiptDialogOpen] = React.useState(false);
   const [selectedReceiptUrl, setSelectedReceiptUrl] = React.useState<string | null>(null);
   const [isConfirmPaymentDialogOpen, setIsConfirmPaymentDialogOpen] = React.useState(false);
   const [paymentToConfirmId, setPaymentToConfirmId] = React.useState<number | null>(null);
+  const [pendingApplications, setPendingApplications] = useState<StudentRegistration[]>([]);
+  const [reviewedApplications, setreviewedApplications] = useState<StudentRegistration[]>([]);
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  useEffect(() => {
+    // Fetch all data when component mounts
+    const fetchData = async () => {
+      try {
+        const [pendingApps] = await Promise.all([
+          registrationsApi.fetchPendingApplications(0)
+        ]);
+        
+        setPendingApplications(pendingApps);
+      
+               
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        // Handle error appropriately, e.g., show a notification
+      }
+    };
+    
+    fetchData();
+  }, []);
+  
   // Mock data for pending applications
-  const pendingApplications = [
-    { id: 6, name: "نورا عبدالله", track: "تطوير تطبيقات الجوال", date: "2023-09-12", status: "disapproved", email: "noura.abdullah@example.com", type: "مهني" },
-    { id: 2, name: "سارة أحمد", track: "علوم البيانات", date: "2023-09-16", status: "pending" },
-    { id: 8, name: "فاطمة علي", track: "الأمن السيبراني", date: "2023-09-14", status: "disapproved", email: "fatima.ali@example.com", type: "مهني" },
-  ];
+  // const pendingApplications = [
+  //   { id: 6, name: "نورا عبدالله", track: "تطوير تطبيقات الجوال", date: "2023-09-12", status: "disapproved", email: "noura.abdullah@example.com", type: "مهني" },
+  //   { id: 2, name: "سارة أحمد", track: "علوم البيانات", date: "2023-09-16", status: "pending" },
+  //   { id: 8, name: "فاطمة علي", track: "الأمن السيبراني", date: "2023-09-14", status: "disapproved", email: "fatima.ali@example.com", type: "مهني" },
+  // ];
+
+
+useEffect(() => {
+    // Fetch all data when component mounts
+    const fetchData = async () => {
+      try {
+        const [reviewedApplications] = await Promise.all([
+          registrationsApi.fetchProcessedApplications(3)
+        ]);
+        
+        setreviewedApplications(reviewedApplications);
+      
+               
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        // Handle error appropriately, e.g., show a notification
+      }
+    };
+    
+    fetchData();
+  }, []);
 
   // Mock data for reviewed applications
-  const reviewedApplications = [
-    { id: 4, name: "مريم حسن", track: "الذكاء الاصطناعي وتعلم الآلة", date: "2023-09-10", status: "approved", email: "sara.fahad@example.com", type: "مهني" },
-    { id: 5, name: "محمد إبراهيم", track: "تطوير الويب", date: "2023-09-11", status: "disapproved", email: "mohammed.ibrahim@example.com", type: "أكاديمي" },
-    { id: 6, name: "نورا عبدالله", track: "تطوير تطبيقات الجوال", date: "2023-09-12", status: "modified" },
-    { id: 7, name: "خالد عمر", track: "علوم الحاسوب", date: "2023-09-13", status: "approved", email: "khaled.omar@example.com", type: "أكاديمي" },
-  ];
+  // const reviewedApplications = [
+  //   { id: 4, name: "مريم حسن", track: "الذكاء الاصطناعي وتعلم الآلة", date: "2023-09-10", status: "approved", email: "sara.fahad@example.com", type: "مهني" },
+  //   { id: 5, name: "محمد إبراهيم", track: "تطوير الويب", date: "2023-09-11", status: "disapproved", email: "mohammed.ibrahim@example.com", type: "أكاديمي" },
+  //   { id: 6, name: "نورا عبدالله", track: "تطوير تطبيقات الجوال", date: "2023-09-12", status: "modified" },
+  //   { id: 7, name: "خالد عمر", track: "علوم الحاسوب", date: "2023-09-13", status: "approved", email: "khaled.omar@example.com", type: "أكاديمي" },
+  // ];
 
   // Mock data for payments pending confirmation
   // Mock data for payments pending confirmation
@@ -50,19 +98,20 @@ const AdminDashboard = () => {
     { id: 7, name: "خالد عمر", track: "علوم الحاسوب", date: "2023-09-18", amount: "٢,٢٠٠ ريال", receiptImageUrl: "https://via.placeholder.com/400x600.png?text=Receipt+Khaled" },
   ];
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: number) => {
+    debugger;
     switch (status) {
-      case "accepted":
+      case 1:
         return <Badge className="bg-green-500">مقبول</Badge>;
-      case "rejected":
+      case 2:
         return <Badge variant="destructive">مرفوض</Badge>;
-      case "modified":
+      case -1:
         return <Badge variant="outline" className="border-amber-500 text-amber-500">طلب تعديل</Badge>;
-      case "pending":
+      case 0:
         return <Badge variant="outline" className="border-blue-500 text-blue-500">قيد المراجعة</Badge>;
-      case "disapproved":
+      case 2:
         return <Badge variant="outline" className="border-red-500 text-red-500">مرفوض</Badge>;
-      case "approved":
+      case 1:
         return <Badge variant="outline" className="border-green-500 text-green-500">مقبول</Badge>;
       default:
         return <Badge variant="outline">غير معروف</Badge>;
@@ -78,7 +127,7 @@ const AdminDashboard = () => {
         <Tabs defaultValue="applications" dir="rtl">
           <TabsList className="mb-6">
             <TabsTrigger value="applications">الطلبات</TabsTrigger>
-            <TabsTrigger value="payments">المدفوعات</TabsTrigger>
+            {/* <TabsTrigger value="payments">المدفوعات</TabsTrigger> */}
 
           </TabsList>
 
@@ -95,7 +144,7 @@ const AdminDashboard = () => {
                       <div key={app.id} className="mb-4 p-4 border rounded-lg">
                         <div className="flex justify-between items-start mb-2">
                           <div className="text-right">
-                            <p className="text-sm text-muted-foreground">تاريخ التقديم: {app.date}</p>
+                            <p className="text-sm text-muted-foreground">تاريخ التقديم: {app.RegistrationDate}</p>
                           </div>
                           <div className="flex items-center gap-3">
                             <div className="text-right">
