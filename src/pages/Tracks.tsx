@@ -41,7 +41,7 @@ const Tracks = () => {
             transition={{ duration: 0.5 }}
             className="max-w-2xl mx-auto text-center"
           >
-            <h1 className="text-4xl font-bold tracking-tight">البرامج</h1>
+            <h1 className="text-4xl font-bold tracking-tight text-[#002b4e]">البرامج</h1>
             <p className="mt-4 text-lg text-muted-foreground">
               استكشف مجموعتنا المتنوعة من البرامج المصممة لإعدادك للنجاح.
             </p>

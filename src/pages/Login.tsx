@@ -199,7 +199,7 @@ const Login = () => {
         <div className="flex flex-1 min-h-0 items-center justify-center">
           <Card className="w-full max-w-md">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-center">تسجيل الدخول</CardTitle>
+              <CardTitle className="text-2xl font-bold text-center text-[#002b4e]">تسجيل الدخول</CardTitle>
               <CardDescription className="text-center">
                 قم بتسجيل الدخول للوصول إلى البرامج
               </CardDescription>
@@ -255,7 +255,7 @@ const Login = () => {
                   <p className="text-center text-sm text-muted-foreground">
                     <button
                       type="button"
-                      className="text-blue-700 hover:underline font-medium"
+                      className="text-primary hover:underline font-medium"
                       style={{ direction: 'rtl' }}
                       onClick={() => navigate('/forgot-password')}
                     >

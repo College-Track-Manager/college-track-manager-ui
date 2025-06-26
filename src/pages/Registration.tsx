@@ -105,10 +105,20 @@ const Registration = () => {
 
   if (formSubmitted) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px]">
-        <CheckCircle size={64} className="text-green-500 mb-4" />
-        <h2 className="text-2xl font-bold mb-2">تم إنشاء الحساب بنجاح</h2>
-        <Button onClick={() => navigate('/login')}>تسجيل الدخول</Button>
+      <div className="flex flex-col items-center bg-neutral-100 px-4 py-8 text-center mt-20">
+        <div className="flex items-center justify-center w-24 h-24 rounded-full bg-neutral-200 mb-6 shadow-sm mx-auto">
+          <CheckCircle size={56} color="#1992c8" />
+        </div>
+        <h1 className="text-2xl md:text-3xl font-extrabold mb-4 text-neutral-800">تم إنشاء الحساب بنجاح</h1>
+        <p className="text-neutral-600 mb-8 max-w-md mx-auto">
+          يمكنك الآن تسجيل الدخول باستخدام بريدك الإلكتروني وكلمة المرور
+        </p>
+        <Button 
+          onClick={() => navigate('/login')}
+          className="text-[#1992c8] text-lg md:text-xl font-normal py-3 rounded-lg bg-transparent border-0 outline-none transition-all duration-150 hover:underline hover:bg-[#1992c80d] focus:ring-2 focus:ring-[#1992c8] focus:ring-opacity-40"
+        >
+          تسجيل الدخول
+        </Button>
       </div>
     );
   }
@@ -116,7 +126,7 @@ const Registration = () => {
   return (
     <PageTransition>
       <div className="max-w-2xl mx-auto mt-20 mb-12 p-8 bg-white rounded-xl shadow-lg">
-        <h1 className="text-3xl font-bold mb-8 text-center text-blue-700">تسجيل حساب جديد</h1>
+        <h1 className="text-3xl font-bold mb-8 text-center text-[#002b4e]">تسجيل حساب جديد</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <RegistrationFields control={form.control} />
