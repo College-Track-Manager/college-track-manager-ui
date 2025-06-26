@@ -8,7 +8,9 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
+import { forgotPassword } from '@/services/login';
 
 const loginSchema = z.object({
   email: z.string({
@@ -26,12 +28,6 @@ const loginSchema = z.object({
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
-
-import { useLocation } from 'react-router-dom';
-
-import { useAuth } from '@/context/AuthContext';
-
-import { forgotPassword } from '@/services/login';
 
 const Login = () => {
   const [showChangePassword, setShowChangePassword] = useState(false);

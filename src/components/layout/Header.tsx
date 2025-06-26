@@ -31,7 +31,7 @@ const Header = () => {
       toast.success('تم تسجيل الخروج بنجاح', {
         position: 'top-center',
         duration: 3000,
-        className: 'bg-green-50 text-green-800 border-green-200 rtl font-tajawal flex items-center justify-center gap-2',
+        className: 'bg-blue-50 text-blue-800 border-blue-200 rtl font-tajawal flex items-center justify-center gap-2',
         style: {
           direction: 'rtl',
           fontFamily: 'Tajawal, sans-serif',
@@ -41,8 +41,8 @@ const Header = () => {
           textAlign: 'center',
         },
         icon: (
-          <div className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-green-100 flex-shrink-0">
-            <svg className="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 flex-shrink-0">
+            <svg className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
