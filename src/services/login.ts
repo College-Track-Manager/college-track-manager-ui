@@ -12,6 +12,7 @@ export const registerUser = async (data: any) => {
 interface LoginResponse {
   token: string;
   expiration: string;
+  message?: string; // Optional message for error cases
   user: {
     email: string;
     name: string;
@@ -21,10 +22,16 @@ interface LoginResponse {
 
 export const loginUser = async (data: { email: string; password: string }): Promise<LoginResponse> => {
   try {
+    // Transform the data to match the API's expected format
+    const apiData = {
+      Username: data.email,
+      Password: data.password
+    };
+    
     const res = await fetch(`${API_BASE}/login/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: JSON.stringify(apiData),
     });
 
     if (!res.ok) {

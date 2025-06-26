@@ -35,8 +35,10 @@ export default function ResetPassword() {
 
   // Real-time validation effects
   useEffect(() => {
-    if (newPassword.length > 0 && newPassword.length < 6) {
-      setShowPasswordError(true);
+    if (newPassword.length > 0) {
+      const hasMinLength = newPassword.length >= 6;
+      const hasUppercase = /[A-Z]/.test(newPassword);
+      setShowPasswordError(!hasMinLength || !hasUppercase);
     } else {
       setShowPasswordError(false);
     }
@@ -131,13 +133,23 @@ export default function ResetPassword() {
                   onChange={e => setNewPassword(e.target.value)}
                 />
                 {showPasswordError && (
-                  <p className="text-sm text-red-500 flex items-center gap-1">
-                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" className="flex-shrink-0">
-                      <circle cx="12" cy="12" r="12" fill="#ef4444"/>
-                      <path d="M15 9l-6 6M9 9l6 6" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
-                    يجب أن تتكون كلمة المرور من 6 أحرف على الأقل
-                  </p>
+                  <div className="space-y-1">
+                    <p className="text-sm text-red-500 flex items-start gap-1">
+                      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5">
+                        <circle cx="12" cy="12" r="12" fill="#ef4444"/>
+                        <path d="M15 9l-6 6M9 9l6 6" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
+                      </svg>
+                      يجب أن تحتوي كلمة المرور على:
+                    </p>
+                    <ul className="text-sm text-red-500 list-disc list-inside space-y-1 pl-5">
+                      <li className={newPassword.length >= 6 ? 'text-green-600' : ''}>
+                        {newPassword.length >= 6 ? '✓ ' : '• '}6 أحرف على الأقل
+                      </li>
+                      <li className={/[A-Z]/.test(newPassword) ? 'text-green-600' : ''}>
+                        {/[A-Z]/.test(newPassword) ? '✓ ' : '• '}حرف كبير واحد على الأقل (A-Z)
+                      </li>
+                    </ul>
+                  </div>
                 )}
               </div>
               <div className="space-y-1">

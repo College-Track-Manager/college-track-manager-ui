@@ -8,9 +8,7 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useLocation } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import { forgotPassword } from '@/services/login';
+import { CheckCircle, XCircle } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z.string({
@@ -28,6 +26,12 @@ const loginSchema = z.object({
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
+
+import { useLocation } from 'react-router-dom';
+
+import { useAuth } from '@/context/AuthContext';
+
+import { forgotPassword } from '@/services/login';
 
 const Login = () => {
   const [showChangePassword, setShowChangePassword] = useState(false);
@@ -52,16 +56,26 @@ const Login = () => {
   });
 
   const onSubmit = async (data: LoginFormValues) => {
+    // Client-side validation
+    const validation = loginSchema.safeParse(data);
+    
+    if (!validation.success) {
+      // This will show validation errors in the form
+      const errors = validation.error.format();
+      console.log('Validation errors:', errors);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       // Use backend API for login
       const { loginUser } = await import("@/services/login");
-      const response = await loginUser({ Username: data.email, Password: data.password });
+      const response = await loginUser({ email: data.email, password: data.password });
       console.log('Login response:', response);
-      if (response.token) {
+      
+      if (response?.token) {
         login(response.token); // Immediate auth context update
         console.log('Token after login():', localStorage.getItem('token'));
-
 
         // Robust redirection: avoid redirecting back to /login or undefined
         const from = (location.state as any)?.from?.pathname;
@@ -78,27 +92,49 @@ const Login = () => {
           }
         }, 500);
       } else {
+        // Show error message from server if available, otherwise show default message
+        const errorMessage = response?.message || 'يرجى التحقق من البريد الإلكتروني وكلمة المرور والمحاولة مرة أخرى';
         toast.error('فشل تسجيل الدخول', {
-          description: response.message || 'يرجى التحقق من البريد الإلكتروني وكلمة المرور والمحاولة مرة أخرى',
+          description: errorMessage,
           duration: 5000,
           icon: <XCircle className="h-5 w-5 text-red-500" />, 
+          className: 'shadow-lg',
           style: {
             background: '#fef2f2',
             border: '1px solid #fca5a5',
             color: '#991b1b',
+            padding: '1rem 1.25rem',
+            borderRadius: '0.5rem',
+            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
           },
+          position: 'top-center',
         });
       }
     } catch (error) {
+      console.error('Login error:', error);
+      let errorMessage = 'حدث خطأ في الاتصال بالخادم';
+      
+      // Handle different types of errors
+      if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       toast.error('فشل تسجيل الدخول', {
-        description: 'حدث خطأ في الاتصال بالخادم',
+        description: errorMessage,
         duration: 5000,
         icon: <XCircle className="h-5 w-5 text-red-500" />, 
+        className: 'shadow-lg',
         style: {
           background: '#fef2f2',
           border: '1px solid #fca5a5',
           color: '#991b1b',
+          padding: '1rem 1.25rem',
+          borderRadius: '0.5rem',
+          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
         },
+        position: 'top-center',
       });
     } finally {
       setIsSubmitting(false);
@@ -199,7 +235,7 @@ const Login = () => {
         <div className="flex flex-1 min-h-0 items-center justify-center">
           <Card className="w-full max-w-md">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-center text-[#002b4e]">تسجيل الدخول</CardTitle>
+              <CardTitle className="text-2xl font-bold text-center">تسجيل الدخول</CardTitle>
               <CardDescription className="text-center">
                 قم بتسجيل الدخول للوصول إلى البرامج
               </CardDescription>
@@ -255,7 +291,7 @@ const Login = () => {
                   <p className="text-center text-sm text-muted-foreground">
                     <button
                       type="button"
-                      className="text-primary hover:underline font-medium"
+                      className="text-blue-700 hover:underline font-medium"
                       style={{ direction: 'rtl' }}
                       onClick={() => navigate('/forgot-password')}
                     >
