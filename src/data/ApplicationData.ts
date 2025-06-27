@@ -4,6 +4,7 @@ export interface ApplicationData {
   email: string;
   trackType: 'academic' | 'professional';
   track: string;
+  trackDegree:string;
   educationLevel: string;
   studyType: 'online' | 'offline';
   education: string;

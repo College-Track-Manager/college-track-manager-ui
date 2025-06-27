@@ -21,9 +21,9 @@ import { registrationsApi } from '@/services/registrations'
 import { useEffect, useState } from 'react';
 import { ApplicationData } from '@/data/ApplicationData';
 import { useNavigate } from 'react-router-dom';
-
+import { getToken } from '@/services/login';
 // Mock data structure for an application - replace with actual data fetching
-
+import axios from 'axios';
 
 const ApplicationReviewPage = () => {
   const location = useLocation();
@@ -132,7 +132,9 @@ const currentValue = rejectionReason; // Always up-to-date
 
       const data =  registrationsApi.ApproveRegistration(applicationId,1,"");
       setIsAlertDialogOpen(false);
+      debugger;
        navigate(`/admin/dashboard`);
+       window.location.reload(); // This will force a full page refresh
   }
 
     const RejectRegistration = async () =>{     
@@ -141,32 +143,52 @@ const currentValue = rejectionReason; // Always up-to-date
        // Redirect after success
      
       navigate(`/admin/dashboard`);
+      debugger;
+      window.location.reload(); // This will force a full page refresh
   }
+
+      const fetchFiles = async (fullUrl) =>{     
+       const token = getToken();
+       const response = await axios.get(fullUrl, { responseType: 'blob',
+             headers: {
+               Authorization: `Bearer ${token}`,
+             },
+           });
+
+           return response;
+  }
+
 
   const handleDownloadAllDocuments = async () => {
     if (!applicationData) return;
-
+    debugger;
     const zip = new JSZip();
     const documentsToDownload = [];
-    applicationData.resumeUrl = `${import.meta.env.VITE_API_BASE_URL}/api/SecureFiles/download/6c67c83b-34f8-4d4c-807d-f455496b52ab_f6b101b6-1ef0-4839-9fc9-67d3e0a2303e_1.jpg`;
-
+    
+    applicationData.resumeUrl = `${import.meta.env.VITE_API_BASE_URL}/api/SecureFiles/download/${applicationData.resumeUrl}`;
+    const response = await fetchFiles( applicationData.resumeUrl );
+    saveAs(response.data as Blob, "cv.pdf");
     if (applicationData.resumeUrl && applicationData.resumeUrl !== '#') {
-      documentsToDownload.push({ name: 'resume.pdf', url: applicationData.resumeUrl });
+      documentsToDownload.push({ name: 'resume.pdf', url: response.data });
     } else if (applicationData.resumeUrl === '#') {
         // Placeholder for actual file fetching
         zip.file('resume_placeholder.txt', 'This is a placeholder for the resume.\nActual file content would be fetched from: ' + applicationData.resumeUrl);
     }
     
-    applicationData.transcriptUrl = `${import.meta.env.VITE_API_BASE_URL}/api/SecureFiles/download/a9104f48-4d5a-450c-ab73-d0a3a6fb7c45_0e0b32bf-5856-4acc-9235-0a358dc39a90_1.jpg`;
+    applicationData.transcriptUrl = `${import.meta.env.VITE_API_BASE_URL}/api/SecureFiles/download/${applicationData.transcriptUrl}`;
+    const transResponse = await fetchFiles( applicationData.transcriptUrl );
+    saveAs(transResponse.data as Blob, "transcript.pdf");
     if (applicationData.transcriptUrl && applicationData.transcriptUrl !== '#') {
-      documentsToDownload.push({ name: 'transcript.pdf', url: applicationData.transcriptUrl });
+      documentsToDownload.push({ name: 'transcript.pdf', url: transResponse.data});
     } else if (applicationData.transcriptUrl === '#') {
         zip.file('transcript_placeholder.txt', 'This is a placeholder for the transcript.\nActual file content would be fetched from: ' + applicationData.transcriptUrl);
     }
 
-    applicationData.idCardUrl = `${import.meta.env.VITE_API_BASE_URL}/api/SecureFiles/download/6c67c83b-34f8-4d4c-807d-f455496b52ab_f6b101b6-1ef0-4839-9fc9-67d3e0a2303e_1.jpg`;
+    applicationData.idCardUrl =`${import.meta.env.VITE_API_BASE_URL}/api/SecureFiles/download/${applicationData.idCardUrl}`;
+    const cardResponse = await fetchFiles( applicationData.idCardUrl );
+    saveAs(cardResponse.data as Blob, "card.pdf");
     if (applicationData.idCardUrl && applicationData.idCardUrl !== '#') {
-      documentsToDownload.push({ name: 'id_card.pdf', url: applicationData.idCardUrl });
+      documentsToDownload.push({ name: 'id_card.pdf', url: cardResponse.data});
     } else if (applicationData.idCardUrl === '#') {
         zip.file('id_card_placeholder.txt', 'This is a placeholder for the ID card.\nActual file content would be fetched from: ' + applicationData.idCardUrl);
     }
@@ -191,12 +213,14 @@ const currentValue = rejectionReason; // Always up-to-date
 
     try {
       const zipBlob = await zip.generateAsync({ type: 'blob' });
-      saveAs(zipBlob, `application_documents_${applicationData.id}.zip`);
+      //saveAs(zipBlob, `application_documents_${applicationData.id}.zip`);
     } catch (error) {
       console.error('Error creating zip file:', error);
       alert('حدث خطأ أثناء إنشاء ملف المستندات المضغوط.');
     }
   };
+
+  
 
   return (
     <PageTransition>
@@ -242,7 +266,7 @@ const currentValue = rejectionReason; // Always up-to-date
                 </div>
                 <div>
                   <Label htmlFor="educationLevel" className="mb-2 block">المرحلة الدراسية</Label>
-                  <Input id="educationLevel" defaultValue={applicationData.educationLevel} readOnly className="bg-gray-50" />
+                  <Input id="educationLevel" defaultValue={applicationData.trackDegree} readOnly className="bg-gray-50" />
                 </div>
                 <div>
                   <Label htmlFor="studyType" className="mb-2 block">نوع الدراسة</Label>
@@ -301,9 +325,7 @@ const currentValue = rejectionReason; // Always up-to-date
                 </Button>
               </div>
             )}
-
           
-
           </CardContent>
         </Card>
               <AlertDialog open={isAlertDialogOpen} onOpenChange={setIsAlertDialogOpen} >

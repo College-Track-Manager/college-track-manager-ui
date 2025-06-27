@@ -14,6 +14,7 @@ export interface StudentProfile {
   registrationDate: string;
   status : number;
   statusDesctiption : string;
+  adminComments :string;
   track: {
     id: number;
     title: string;
@@ -56,6 +57,7 @@ export async function fetchStudentProfile(): Promise<StudentProfile | null> {
       registrationDate: data.registrationDate || "",
       status: data.status || -1,
       statusDesctiption: data.statusDesctiption || "غير محدد",
+      adminComments: data.adminComments || "",
       track: data.track || { id: 0, title: "", shortDescription: "", duration: "" },
       courses: Array.isArray(data.courses) ? data.courses : [],
     };

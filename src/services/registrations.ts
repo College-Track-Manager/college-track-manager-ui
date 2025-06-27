@@ -12,7 +12,7 @@ export interface StudentRegistration {
   Phone: string;
   Address: string;
   track: string;
-  RegistrationDate : string;
+  registrationDate : string;
   Education: string;
   Statement: string;
   ResumePath?: string;
@@ -60,6 +60,7 @@ export const registrationsApi = {
   },
 
   fetchPendingApplications: async (id: number): Promise<StudentRegistration[]> => {
+    debugger;
     const url = `${API_BASE_URL}/api/StudentRegistrations/GetStudentRegistratrions?studentRegistrationType=0`;
     console.log('[registrationsApi.getStatus] GET', url);
     try {
@@ -68,11 +69,12 @@ export const registrationsApi = {
        const track = response.data;
        return track;
     } catch (error) {
-      console.error('[registrationsApi.getStatus] Error:', error);
+      //console.error('[registrationsApi.getStatus] Error:', error);
       throw error;
     }
   },
     fetchProcessedApplications: async (id: number): Promise<StudentRegistration[]> => {
+      debugger;
     const url = `${API_BASE_URL}/api/StudentRegistrations/GetStudentRegistratrions?studentRegistrationType=3`; // Processes applicagtions
     console.log('[registrationsApi.getStatus] GET', url);
     try {
@@ -81,7 +83,7 @@ export const registrationsApi = {
        const track = response.data;
        return track;
     } catch (error) {
-      console.error('[registrationsApi.getStatus] Error:', error);
+     //console.error('[registrationsApi.getStatus] Error:', error);
       throw error;
     }
   },

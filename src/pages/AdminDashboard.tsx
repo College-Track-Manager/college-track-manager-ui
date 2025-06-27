@@ -144,7 +144,7 @@ useEffect(() => {
                       <div key={app.id} className="mb-4 p-4 border rounded-lg">
                         <div className="flex justify-between items-start mb-2">
                           <div className="text-right">
-                            <p className="text-sm text-muted-foreground">تاريخ التقديم: {app.RegistrationDate}</p>
+                            <p className="text-sm text-muted-foreground">تاريخ التقديم: {new Date(app.registrationDate).toLocaleDateString('ar-EG')}</p>
                           </div>
                           <div className="flex items-center gap-3">
                             <div className="text-right">
@@ -188,7 +188,7 @@ useEffect(() => {
                             </Avatar>
                           </div>
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1 mb-3 text-right">تاريخ المراجعة: {app.date}</p>
+                        <p className="text-sm text-muted-foreground mt-1 mb-3 text-right">تاريخ المراجعة: {new Date(app.registrationDate).toLocaleDateString('ar-EG')}</p>
                         <Button size="sm" variant="outline" onClick={() => navigate(`/admin/review-application/${app.id}`, { state: { isReadOnlyView: true, status: app.status, applicantName: app.name, trackName: app.track } })}>عرض التفاصيل</Button>
                       </div>
                     ))}

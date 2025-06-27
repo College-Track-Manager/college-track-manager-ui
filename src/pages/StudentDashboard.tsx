@@ -120,14 +120,17 @@ const StudentDashboard = () => {
             <CardHeader>
               <CardTitle className="text-lg">معلومات المسار الأكاديمي</CardTitle>
             </CardHeader>
-            <CardContent className="text-sm space-y-2">
+           <CardContent className="text-sm space-y-2">
               <div><strong>التخصص:</strong> {profile.education}</div>
               <div><strong>نوع المسار:</strong> {getTrackTypeString(profile.trackType)}</div>
               <div><strong>درجة المسار:</strong> {getTrackDegreeString(profile.trackDegree)}</div>
               <div><strong>نوع الدراسة:</strong> {getStudyTypeString(profile.studyType)}</div>
               <div><strong>تاريخ التسجيل:</strong> {new Date(profile.registrationDate).toLocaleDateString('ar-EG')}</div>
-              <div><strong>حالة التسجيل</strong> {profile.statusDesctiption}</div>
-            </CardContent>
+              <div><strong>حالة التسجيل</strong> {getStatusBadge(profile.status)}</div>
+              {profile.statusDesctiption?.includes('مرفوض') || profile.status === 2 || profile.statusDesctiption?.includes('rejected') ? (
+                <div><strong>سبب الرفض</strong> {profile.adminComments}</div>
+              ) : null}
+        </CardContent>
           </Card>
         </div>
 
@@ -169,5 +172,25 @@ const StudentDashboard = () => {
     </PageTransition>
   );
 };
+
+const getStatusBadge = (status: number) => {
+   
+    switch (status) {
+      case 1:
+        return <Badge className="bg-green-500">مقبول</Badge>;
+      case 2:
+        return <Badge variant="destructive">مرفوض</Badge>;
+      case -1:
+        return <Badge variant="outline" className="border-blue-500 text-blue-500">قيد المراجعة</Badge>;
+      case 0:
+        return <Badge variant="outline" className="border-blue-500 text-blue-500">قيد المراجعة</Badge>;
+      case 2:
+        return <Badge variant="outline" className="border-red-500 text-red-500">مرفوض</Badge>;
+      case 1:
+        return <Badge variant="outline" className="border-green-500 text-green-500">مقبول</Badge>;
+      default:
+        return <Badge variant="outline">غير معروف</Badge>;
+    }
+  };
 
 export default StudentDashboard;
