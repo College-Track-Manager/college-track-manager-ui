@@ -1,7 +1,8 @@
-const API_BASE = "http://localhost:5050/api";
+import { API_BASE_URL } from './config.ts';
+
 
 export const registerUser = async (data: any) => {
-  const res = await fetch(`${API_BASE}/userregistration/register`, {
+  const res = await fetch(`${API_BASE_URL}/api/userregistration/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -10,7 +11,7 @@ export const registerUser = async (data: any) => {
 };
 
 export const loginUser = async (data: any) => {
-  const res = await fetch(`${API_BASE}/login/login`, {
+  const res = await fetch(`${API_BASE_URL}/api/login/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -38,7 +39,7 @@ export const forgotPassword = async (email: string) => {
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
-  const res = await fetch(`${API_BASE}/login/forgot-password`, {
+  const res = await fetch(`${API_BASE_URL}/api/login/forgot-password`, {
     method: "POST",
     headers,
     body: JSON.stringify({ email }),
@@ -63,7 +64,7 @@ export const forgotPassword = async (email: string) => {
  * @returns Response from the backend, with ok and status
  */
 export async function resetPasswordApi({ email, token, newPassword }: { email: string; token: string; newPassword: string }) {
-  const res = await fetch(`${API_BASE}/login/reset-password`, {
+  const res = await fetch(`${API_BASE_URL}/api/login/reset-password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, token, newPassword }),

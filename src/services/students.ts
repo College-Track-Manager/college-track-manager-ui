@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { getToken } from './login';
+import { API_BASE_URL } from './config';
 
 export interface StudentProfile {
   fullName: string;
@@ -32,7 +33,8 @@ export interface StudentProfile {
 export async function fetchStudentProfile(): Promise<StudentProfile | null> {
   const token = getToken();
   try {
-    const response = await axios.get('http://localhost:5050/api/StudentRegistrations/profile', {
+    const url = `${API_BASE_URL}/api/StudentRegistrations/profile`;
+    const response = await axios.get(url, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

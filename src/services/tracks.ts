@@ -46,11 +46,6 @@ const fetchTracksByType = async (type: TrackType): Promise<Track[]> => {
 };
 
 const fetchTrackById = async (id: number): Promise<Track> => {
-  // If backend supports /api/Tracks/{id}, use this:
-  // const response = await axios.get<Track>(`${API_BASE_URL}/api/Tracks/${id}`);
-  // return response.data;
-
-  // Otherwise, fetch all tracks and filter client-side (fallback)
   const response = await axios.get<Track[]>(`${API_BASE_URL}/api/Tracks`);
   const track = response.data.find(t => t.id === id);
   if (!track) throw new Error('Track not found');
