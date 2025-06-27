@@ -295,7 +295,7 @@ const currentValue = rejectionReason; // Always up-to-date
               <h4 className="font-semibold mb-2">المستندات المرفقة:</h4>
               {(applicationData.resumeUrl || applicationData.transcriptUrl || applicationData.idCardUrl) ? (
                 <Button onClick={handleDownloadAllDocuments} variant="outline" className="w-full md:w-auto">
-                  تنزيل جميع المستندات (ملف مضغوط)
+                  تنزيل جميع المستندات 
                 </Button>
               ) : (
                   <p className="text-muted-foreground">لم يتم رفع مستندات.</p>
